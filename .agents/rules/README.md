@@ -33,3 +33,9 @@ applyTo: "<patrón glob o*>"
 | Archivo                                      | Alcance         | Descripción                                       |
 | -------------------------------------------- | --------------- | ------------------------------------------------- |
 | [`context-loading.md`](./context-loading.md) | `always-active` | Carga obligatoria de contexto al inicio de sesión |
+
+## Skills Existentes
+
+| Directorio                                                       | Alcance     | Descripción                                                            |
+| ---------------------------------------------------------------- | ----------- | ---------------------------------------------------------------------- |
+| [`candidate-screening/`](../skills/candidate-screening/SKILL.md) | `on-demand` | Screening y ranking de candidatos para procesos de selección en Nexova |

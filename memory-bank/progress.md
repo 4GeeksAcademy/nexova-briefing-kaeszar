@@ -12,15 +12,16 @@ Fase de **desarrollo inicial**. Se ha establecido la estructura del monorepo, el
 - [x] `.agents/rules/context-loading.md` — regla always-active de carga de contexto
 - [x] `.agents/skills/candidate-screening/SKILL.md` — skill de screening de candidatos
 - [x] `uis/website/` — Web corporativa Next.js con 8 componentes reutilizables
+- [x] `services/api/` — FastAPI backend con endpoints de departamentos y KPIs
+- [x] `uis/backoffice/` — Panel interno con dashboard, departamentos y KPIs
 
 ## Hitos Pendientes
 
 - [ ] `CONTEXT.md` — copiar briefing de Nexova como fuente de verdad del dominio
-- [ ] `services/` — API FastAPI centralizada (endpoints iniciales)
 - [ ] `agents/` — Primer agente de producto (soporte o selección)
 - [ ] `data/` — Estructura de datos y primer dataset de ejemplo
-- [ ] `uis/backoffice/` — Panel interno de administración
 - [ ] Infraestructura de telemetría y logging
+- [ ] Conexión backoffice ↔ API (fetch a services/api/)
 
 ## Notas y Decisiones Recientes
 
@@ -29,3 +30,5 @@ Fase de **desarrollo inicial**. Se ha establecido la estructura del monorepo, el
 - **Decisión:** Se prioriza la automatización de screening de candidatos porque impacta a 40 consultores y es el core business.
 - **Decisión:** El sistema de reglas usa frontmatter YAML con 3 alcances: `always-active`, `file-pattern`, `on-demand`.
 - **Decisión:** Se usa Next.js App Router para el frontend (moderno, SSR/SSG, good para corporate sites).
+- **2026-09-21:** Se creó `services/api/` con FastAPI. Endpoints: `/api/v1/departments/`, `/api/v1/departments/{id}`, `/api/v1/kpis/`, `/api/v1/kpis/staff`, `/api/v1/kpis/revenue`. Datos hardcodeados del briefing (7 departamentos con heads, pain points, needs).
+- **2026-09-21:** Se creó `uis/backoffice/` con Next.js 15. Layout con sidebar de navegación. 3 páginas: Dashboard (KPIs + distribución de personal + directores), Departamentos (cards con pain points), KPIs (métricas por categoría). Mismo sistema de diseño que website (Navy + Teal). Puerto 3001.

@@ -27,6 +27,9 @@ uis/website/
 │       ├── About.tsx           # Sección "Sobre nosotros"
 │       ├── CTA.tsx             # Call to action de contacto
 │       └── Footer.tsx          # Pie de página
+├── public/
+│   ├── application.html        # Formulario público de aplicación
+│   └── validation.js           # Validación accesible y envío simulado
 ├── package.json
 ├── tsconfig.json
 ├── next.config.js
@@ -48,6 +51,8 @@ uis/website/
 
 ## Cómo ejecutar
 
+### Desarrollo local
+
 ```bash
 cd uis/website
 npm install
@@ -55,6 +60,74 @@ npm run dev
 ```
 
 El sitio estará disponible en `http://localhost:3000`
+
+### Desarrollo en GitHub Codespaces con `npx`
+
+También se puede iniciar Next.js directamente con `npx`. La opción
+`--hostname 0.0.0.0` permite que Codespaces exponga el puerto mediante el
+reenvío de puertos:
+
+```bash
+cd uis/website
+npm install
+npx next dev --hostname 0.0.0.0
+```
+
+Después, abre el puerto `3000` desde la pestaña **Ports** de Codespaces o usa:
+
+- Página principal: `http://localhost:3000`
+- Formulario de aplicación: `http://localhost:3000/application.html`
+
+Para detener el servidor, pulsa `Ctrl+C` en la terminal.
+
+## Formulario de aplicación
+
+El formulario está disponible en `public/application.html` y se sirve como
+recurso estático en `/application.html`. El CTA principal de `Hero.tsx`,
+**Aplicar a Nexova**, enlaza directamente con esta ruta.
+
+Incluye:
+
+- HTML semántico con `header`, `main`, `section`, `form`, `fieldset`, `legend`
+  y `footer`.
+- Campos de datos personales y perfil profesional relacionados con las áreas
+  de Nexova.
+- Etiquetas `label` asociadas a todos los campos mediante `for` e `id`.
+- Campos obligatorios mediante `required`.
+- Diseño mobile-first con clases utilitarias de Tailwind CSS.
+- Una columna y botones apilados en móvil; dos columnas y botones horizontales
+  desde el breakpoint `sm`.
+- Atributos ARIA como `aria-label`, `aria-labelledby`, `aria-hidden`,
+  `aria-invalid` y `aria-describedby` donde son necesarios.
+- Mensajes de error específicos, visibles y anunciados con `role="alert"`.
+- Prevención del envío cuando existen errores de validación.
+- Mensaje de éxito con `role="status"` para simular el envío correcto.
+- Validaciones de email, teléfono, experiencia, fechas, extensión del CV y
+  longitud máxima del texto de experiencia.
+- Botón para limpiar el formulario y sus mensajes de validación.
+
+La validación se carga desde `public/validation.js`. El formulario usa
+`novalidate` mediante JavaScript para mostrar mensajes propios y evitar el
+envío real mientras no exista un backend conectado.
+
+## SEO y datos estructurados
+
+El layout principal define metadata SEO mediante `src/app/layout.tsx`.
+Además, el formulario incluye marcado JSON-LD de Schema.org con tipo
+`Organization` para describir Nexova Solutions, su año de fundación y sus
+ubicaciones conocidas en Valencia y Miami.
+
+No se utiliza `JobPosting`, porque el formulario es una aplicación general y
+no representa una vacante específica. Ese tipo de marcado podrá añadirse en
+el futuro en páginas individuales de ofertas de empleo, siempre que los datos
+sean reales y coincidan con el contenido visible.
+
+## Accesibilidad y recursos visuales
+
+Actualmente no se usan imágenes en la landing ni en el formulario, por lo que
+no existen imágenes que requieran atributos `alt`. Si se incorporan imágenes,
+deberán incluir texto alternativo descriptivo; las imágenes puramente
+decorativas deberán marcarse con `alt=""`.
 
 ## Componentes Reutilizables
 

@@ -2,6 +2,19 @@
 
 Sitio web público de Nexova Solutions. Ruta de inicio: `/`
 
+## Archivo principal
+
+Este proyecto fue iniciado previamente con Next.js y utiliza App Router.
+Por ello, no existe un `index.html` tradicional.
+
+La equivalencia funcional es:
+
+```text
+index.html = src/app/page.tsx
+```
+
+`src/app/page.tsx` es la página principal que Next.js sirve en `/`.
+
 ## Tech Stack
 
 - **Framework:** Next.js 15 (App Router)

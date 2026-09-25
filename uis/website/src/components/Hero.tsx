@@ -35,10 +35,10 @@ export default function Hero() {
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4">
             <a
-              href="#contacto"
+              href="/application.html"
               className="px-8 py-3.5 bg-accent-500 text-white font-semibold rounded-lg hover:bg-accent-600 transition-colors text-center"
             >
-              Solicitar una consulta
+              Aplicar a Nexova
             </a>
             <a
               href="#servicios"

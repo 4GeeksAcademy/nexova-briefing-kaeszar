@@ -22,6 +22,7 @@
     </header>
 
     <main>
+      <!-- Responsive layout: one column on mobile, centered with wider spacing on tablet and desktop. -->
       <section class="mx-auto max-w-5xl px-4 pb-12 pt-12 sm:px-6 lg:px-8" aria-labelledby="application-title">
         <div class="mb-10 max-w-3xl">
           <p class="mb-3 text-sm font-semibold uppercase tracking-wide text-teal-700">Únete a Nexova</p>
@@ -38,6 +39,7 @@
             <legend class="text-xl font-semibold text-blue-950">Datos personales</legend>
             <p class="mt-1 text-sm text-slate-600">Completa tus datos para que el equipo de Nexova pueda contactarte.</p>
 
+            <!-- Fields stack on mobile and use two columns from the sm breakpoint upward. -->
             <div class="mt-6 grid gap-6 sm:grid-cols-2">
               <div>
                 <label for="first-name" class="block text-sm font-medium text-slate-700">Nombre <span aria-hidden="true">*</span></label>
@@ -135,9 +137,15 @@
               </label>
             </div>
 
-            <button type="submit" class="mt-8 w-full rounded-lg bg-blue-900 px-5 py-3.5 font-semibold text-white transition hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2 sm:w-auto">
-              Enviar aplicación
-            </button>
+            <!-- Actions stack on mobile and sit side by side on larger screens. -->
+            <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <button type="submit" class="w-full rounded-lg bg-blue-900 px-5 py-3.5 font-semibold text-white transition hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2 sm:w-auto">
+                Enviar aplicación
+              </button>
+              <button type="reset" class="w-full rounded-lg border border-slate-300 bg-white px-5 py-3.5 font-semibold text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2 sm:w-auto">
+                Limpiar formulario
+              </button>
+            </div>
           </div>
         </form>
       </section>

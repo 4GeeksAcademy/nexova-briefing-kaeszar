@@ -41,6 +41,12 @@ export default function Hero() {
               Solicitar una consulta
             </a>
             <a
+              href="/application.html"
+              className="px-8 py-3.5 bg-white text-primary-800 font-semibold rounded-lg hover:bg-primary-50 transition-colors text-center"
+            >
+              Aplicar a Nexova
+            </a>
+            <a
               href="#servicios"
               className="px-8 py-3.5 border-2 border-white/30 text-white font-semibold rounded-lg hover:bg-white/10 transition-colors text-center"
             >

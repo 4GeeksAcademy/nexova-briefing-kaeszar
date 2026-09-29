@@ -4,3 +4,5 @@ Carpeta reservada para dos imágenes estáticas de demostración.
 
 Los archivos que se coloquen aquí son recursos visuales: no deben ejecutarse,
 importarse como código ni tratarse como scripts.
+
+# URL Codespace Form:"https://crispy-space-chainsaw-44vvg546xr93j6jr-3000.app.github.dev/application.html"

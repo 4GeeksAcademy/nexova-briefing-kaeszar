@@ -13,3 +13,9 @@ Organiza `uis/` por **distintas áreas de la compañía** — cada subcarpeta ag
 - **Recomendación**: documenta en este archivo (o en sub-READMEs) las aplicaciones que vayas añadiendo, su objetivo, tecnología usada y cómo ejecutarlas.
 
 > _These instructions are also available in [English](./README.md)._
+
+## Website de Nexova Solutions
+
+El sitio web público se encuentra en [`website/`](./website/). El formulario de aplicación está en `website/public/application.html` y se sirve en la ruta `/application.html`.
+
+El formulario incluye marcado estructurado **JSON-LD de Schema.org**, con tipo `Organization`. Describe Nexova Solutions, su año de fundación (2011) y sus ubicaciones en Valencia, España, y Miami, Florida.

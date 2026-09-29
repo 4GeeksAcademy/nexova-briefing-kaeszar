@@ -27,6 +27,9 @@ uis/website/
 │       ├── About.tsx           # Sección "Sobre nosotros"
 │       ├── CTA.tsx             # Call to action de contacto
 │       └── Footer.tsx          # Pie de página
+├── public/
+│   ├── application.html        # Formulario de aplicación pública (/application.html)
+│   └── validation.js           # Validación accesible del formulario
 ├── package.json
 ├── tsconfig.json
 ├── next.config.js
@@ -55,6 +58,17 @@ npm run dev
 ```
 
 El sitio estará disponible en `http://localhost:3000`
+
+## Formulario de aplicación
+
+El formulario público está en `public/application.html` y Next.js lo sirve en
+`/application.html`. El botón **Aplicar a Nexova** del Hero enlaza a esta ruta.
+Incluye datos personales y profesionales alineados con el briefing de Nexova,
+marcado Schema.org JSON-LD de tipo `Organization`, diseño responsive con clases
+Tailwind y validación en cliente desde `public/validation.js`. La validación se
+realiza al perder foco, al editar los campos y al intentar enviar. El envío es
+una simulación local: no almacena ni transmite datos y todavía no está conectado
+a un backend.
 
 ## Componentes Reutilizables
 

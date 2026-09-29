@@ -23,7 +23,13 @@ export default function CTA() {
             href="tel:+34960123456"
             className="px-8 py-3.5 border-2 border-white/30 text-white font-semibold rounded-lg hover:bg-white/10 transition-colors"
           >
-            📞 +34 960 123 456
+            📞 Valencia: +34 960 123 456
+          </a>
+          <a
+            href="tel:+13055550142"
+            className="px-8 py-3.5 border-2 border-white/30 text-white font-semibold rounded-lg hover:bg-white/10 transition-colors"
+          >
+            📞 Miami (ficticio): +1 305 555 0142
           </a>
         </div>
         <p className="mt-8 text-sm text-primary-200">

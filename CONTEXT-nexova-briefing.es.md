@@ -1,3 +1,9 @@
+## Contacto
+
+**Correo electrónico:** [info@nexovasolutions.com](mailto:info@nexovasolutions.com)
+
+**Teléfono de Miami (ficticio, para demostración):** [+1 305 555 0142](tel:+13055550142)
+
 # Bienvenido a Nexova Solutions
 
 ## AI Engineering · 4Geeks Academy — Briefing de empresa

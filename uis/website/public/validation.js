@@ -6,6 +6,9 @@
 
   const summary = document.querySelector("#form-error-summary");
   const success = document.querySelector("#form-success");
+  const resetNotice = document.querySelector("#form-reset-notice");
+  let preserveSuccessOnReset = false;
+  let showResetNotice = false;
   const maxCvSize = 5 * 1024 * 1024;
   const allowedExtensions = new Set(["pdf", "doc", "docx"]);
   const phonePattern = /^[+()\d][\d\s().-]{6,28}$/;
@@ -127,6 +130,7 @@
   function hideStatusMessages() {
     summary?.classList.add("hidden");
     success?.classList.add("hidden");
+    resetNotice?.classList.add("hidden");
   }
 
   // Custom validation messages replace browser popups while preserving native fallback without JS.
@@ -143,7 +147,11 @@
       if (field === availabilityDate && birthDate?.value) validateField(birthDate);
     });
     field.addEventListener("change", () => {
-      hideStatusMessages();
+      if (preserveSuccessOnReset) {
+        preserveSuccessOnReset = false;
+      } else {
+        hideStatusMessages();
+      }
       if (field.getAttribute("aria-invalid") === "true" || field.type === "file" || field.type === "checkbox" || field.tagName === "SELECT") {
         validateField(field);
       }
@@ -160,7 +168,19 @@
           errorElement.classList.add("hidden");
         }
       }
-      hideStatusMessages();
+      if (preserveSuccessOnReset) {
+        preserveSuccessOnReset = false;
+      } else {
+        summary?.classList.add("hidden");
+        success?.classList.add("hidden");
+        if (showResetNotice) {
+          showResetNotice = false;
+          resetNotice?.classList.remove("hidden");
+          resetNotice?.focus();
+        } else {
+          resetNotice?.classList.add("hidden");
+        }
+      }
     }, 0);
   });
 
@@ -185,8 +205,17 @@
       return;
     }
 
+    // Reset the fields but keep the confirmation visible after a valid submission.
+    preserveSuccessOnReset = true;
+    showResetNotice = false;
+    form.reset();
     success?.classList.remove("hidden");
     success?.focus();
-    form.reset();
+  });
+
+  form.addEventListener("reset", () => {
+    // A user-triggered reset should give a small confirmation; the successful-submit
+    // reset is handled separately above and keeps its success message instead.
+    if (!preserveSuccessOnReset) showResetNotice = true;
   });
 })();

@@ -89,7 +89,13 @@ export default function Footer() {
               Síguenos en redes
             </h4>
             <ul className="space-y-3">
-              <li className="flex items-center gap-3 rounded-xl bg-white/[0.04] p-3">
+              <li>
+                <a
+                  href="https://www.linkedin.com/company/nexovacyber/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 rounded-xl bg-white/[0.04] p-3 transition-colors hover:bg-white/[0.08] focus:outline-none focus:ring-2 focus:ring-white"
+                >
                 <span
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#0A66C2] text-lg font-bold text-white shadow-sm"
                   aria-hidden="true"
@@ -98,10 +104,17 @@ export default function Footer() {
                 </span>
                 <span className="min-w-0">
                   <span className="block text-sm font-semibold text-white">LinkedIn</span>
-                  <span className="text-xs text-neutral-400">Perfil próximamente</span>
+                  <span className="text-xs text-neutral-400">Visitar perfil</span>
                 </span>
+                </a>
               </li>
-              <li className="flex items-center gap-3 rounded-xl bg-white/[0.04] p-3">
+              <li>
+                <a
+                  href="https://www.instagram.com/nexovacyber/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 rounded-xl bg-white/[0.04] p-3 transition-colors hover:bg-white/[0.08] focus:outline-none focus:ring-2 focus:ring-white"
+                >
                 <span
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 via-rose-500 to-purple-600 text-white shadow-sm"
                   aria-hidden="true"
@@ -114,10 +127,17 @@ export default function Footer() {
                 </span>
                 <span className="min-w-0">
                   <span className="block text-sm font-semibold text-white">Instagram</span>
-                  <span className="text-xs text-neutral-400">Perfil próximamente</span>
+                  <span className="text-xs text-neutral-400">Visitar perfil</span>
                 </span>
+                </a>
               </li>
-              <li className="flex items-center gap-3 rounded-xl bg-white/[0.04] p-3">
+              <li>
+                <a
+                  href="https://www.facebook.com/nexovacyber/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 rounded-xl bg-white/[0.04] p-3 transition-colors hover:bg-white/[0.08] focus:outline-none focus:ring-2 focus:ring-white"
+                >
                 <span
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#1877F2] text-2xl font-bold leading-none text-white shadow-sm"
                   aria-hidden="true"
@@ -126,8 +146,9 @@ export default function Footer() {
                 </span>
                 <span className="min-w-0">
                   <span className="block text-sm font-semibold text-white">Facebook</span>
-                  <span className="text-xs text-neutral-400">Perfil próximamente</span>
+                  <span className="text-xs text-neutral-400">Visitar perfil</span>
                 </span>
+                </a>
               </li>
             </ul>
           </div>

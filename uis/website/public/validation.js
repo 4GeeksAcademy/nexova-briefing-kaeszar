@@ -13,6 +13,9 @@
   const allowedExtensions = new Set(["pdf", "doc", "docx"]);
   const phonePattern = /^\+\d[\d\s().-]*$/;
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const maxCoverLetterLength = 500;
+  const coverLetter = form.elements.namedItem("coverLetter");
+  const coverLetterCounter = document.querySelector("#cover-letter-counter");
   const cvInput = form.elements.namedItem("cv");
 
   const fields = Array.from(form.querySelectorAll("input, select, textarea")).filter(
@@ -21,7 +24,7 @@
 
   const messageFor = (field) => {
     if (field.validity.valueMissing) {
-      if (field.type === "checkbox") return "Debes aceptar el uso de tus datos para continuar.";
+      if (field.type === "checkbox") return "Confirma que entiendes que esta demostración no envía ni almacena tus datos.";
       if (field.type === "file") return "Adjunta tu currículum para completar la aplicación.";
       if (field.tagName === "SELECT") return "Selecciona una opción para continuar.";
       return "Este campo es obligatorio.";
@@ -71,7 +74,7 @@
       case "availability":
         break;
       case "coverLetter":
-        if (field.value.length > 2000) return "El texto no puede superar los 2.000 caracteres.";
+        if (field.value.length > maxCoverLetterLength) return "El texto no puede superar los 500 caracteres.";
         break;
       case "cv": {
         const file = field.files?.[0];
@@ -83,7 +86,7 @@
         break;
       }
       case "privacyConsent":
-        if (!field.checked) return "Necesitamos tu autorización para gestionar esta aplicación.";
+        if (!field.checked) return "Confirma que entiendes que esta demostración no envía ni almacena tus datos.";
         break;
       default:
         if (!field.checkValidity()) return "Revisa el valor introducido en este campo.";
@@ -130,6 +133,14 @@
     resetNotice?.classList.add("hidden");
   }
 
+  function updateCoverLetterCounter() {
+    if (coverLetter instanceof HTMLTextAreaElement && coverLetterCounter) {
+      coverLetterCounter.textContent = `${coverLetter.value.length}/${maxCoverLetterLength} caracteres`;
+    }
+  }
+
+  updateCoverLetterCounter();
+
   // Custom validation messages replace browser popups while preserving native fallback without JS.
   form.noValidate = true;
 
@@ -139,6 +150,7 @@
     });
     field.addEventListener("input", () => {
       hideStatusMessages();
+      if (field === coverLetter) updateCoverLetterCounter();
       if (field.getAttribute("aria-invalid") === "true") validateField(field);
     });
     field.addEventListener("change", () => {
@@ -155,6 +167,7 @@
 
   form.addEventListener("reset", () => {
     window.setTimeout(() => {
+      updateCoverLetterCounter();
       for (const field of fields) {
         field.removeAttribute("aria-invalid");
         const errorElement = getErrorElement(field);

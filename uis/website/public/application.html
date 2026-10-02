@@ -239,9 +239,15 @@
                   <p id="area-error" class="field-error mt-2 hidden text-sm font-medium text-rose-700" aria-live="polite"></p>
                 </div>
                 <div>
-                  <label for="experience-years" class="block text-sm font-semibold text-slate-700">Años de experiencia <span class="text-rose-700" aria-hidden="true">*</span></label>
-                  <input id="experience-years" name="experienceYears" type="number" min="0" max="60" step="1" inputmode="numeric" required placeholder="Ej.: 5" aria-describedby="experience-years-error" class="form-control mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-base shadow-sm outline-none transition placeholder:text-slate-400 focus:border-nexova-teal focus:ring-4 focus:ring-teal-100" />
-                  <p id="experience-years-error" class="field-error mt-2 hidden text-sm font-medium text-rose-700" aria-live="polite"></p>
+                  <label for="experience-range" class="block text-sm font-semibold text-slate-700">Años de experiencia <span class="text-rose-700" aria-hidden="true">*</span></label>
+                  <select id="experience-range" name="experienceRange" required aria-describedby="experience-range-error" class="form-control mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-base shadow-sm outline-none transition focus:border-nexova-teal focus:ring-4 focus:ring-teal-100">
+                    <option value="">Selecciona un rango</option>
+                    <option value="0-5">De 0 a 5 años</option>
+                    <option value="5-10">De 5 a 10 años</option>
+                    <option value="10-15">De 10 a 15 años</option>
+                    <option value="15-plus">De 15 a 20 años o más</option>
+                  </select>
+                  <p id="experience-range-error" class="field-error mt-2 hidden text-sm font-medium text-rose-700" aria-live="polite"></p>
                 </div>
                 <div>
                   <label for="english-level" class="block text-sm font-semibold text-slate-700">Nivel de inglés <span class="text-rose-700" aria-hidden="true">*</span></label>
@@ -257,9 +263,15 @@
                   <p id="english-level-error" class="field-error mt-2 hidden text-sm font-medium text-rose-700" aria-live="polite"></p>
                 </div>
                 <div>
-                  <label for="availability-date" class="block text-sm font-semibold text-slate-700">Fecha de disponibilidad</label>
-                  <input id="availability-date" name="availabilityDate" type="date" aria-describedby="availability-date-error" class="form-control mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-base shadow-sm outline-none transition focus:border-nexova-teal focus:ring-4 focus:ring-teal-100" />
-                  <p id="availability-date-error" class="field-error mt-2 hidden text-sm font-medium text-rose-700" aria-live="polite"></p>
+                  <label for="availability" class="block text-sm font-semibold text-slate-700">Disponibilidad</label>
+                  <select id="availability" name="availability" aria-describedby="availability-error" class="form-control mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-base shadow-sm outline-none transition focus:border-nexova-teal focus:ring-4 focus:ring-teal-100">
+                    <option value="">Selecciona una opción</option>
+                    <option value="immediate">Inmediata</option>
+                    <option value="two-weeks">En 2 semanas</option>
+                    <option value="one-month">En 1 mes</option>
+                    <option value="negotiable">A convenir</option>
+                  </select>
+                  <p id="availability-error" class="field-error mt-2 hidden text-sm font-medium text-rose-700" aria-live="polite"></p>
                 </div>
               </div>
               <div class="mt-5">

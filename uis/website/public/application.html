@@ -168,9 +168,48 @@
                   <p id="phone-error" class="field-error mt-2 hidden text-sm font-medium text-rose-700" aria-live="polite"></p>
                 </div>
                 <div>
-                  <label for="location" class="block text-sm font-semibold text-slate-700">Ciudad y país de residencia <span class="text-rose-700" aria-hidden="true">*</span></label>
-                  <input id="location" name="location" type="text" autocomplete="address-level2" required minlength="2" maxlength="120" placeholder="Ej.: Valencia, España" aria-describedby="location-error" class="form-control mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-base shadow-sm outline-none transition placeholder:text-slate-400 focus:border-nexova-teal focus:ring-4 focus:ring-teal-100" />
-                  <p id="location-error" class="field-error mt-2 hidden text-sm font-medium text-rose-700" aria-live="polite"></p>
+                  <label for="city" class="block text-sm font-semibold text-slate-700">Ciudad de residencia <span class="text-rose-700" aria-hidden="true">*</span></label>
+                  <input id="city" name="city" type="text" autocomplete="address-level2" required minlength="2" maxlength="80" placeholder="Ej.: Valencia" aria-describedby="city-error" class="form-control mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-base shadow-sm outline-none transition placeholder:text-slate-400 focus:border-nexova-teal focus:ring-4 focus:ring-teal-100" />
+                  <p id="city-error" class="field-error mt-2 hidden text-sm font-medium text-rose-700" aria-live="polite"></p>
+                </div>
+                <div>
+                  <label for="country" class="block text-sm font-semibold text-slate-700">País de residencia <span class="text-rose-700" aria-hidden="true">*</span></label>
+                  <select id="country" name="country" autocomplete="country" required aria-describedby="country-error" class="form-control mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-base shadow-sm outline-none transition focus:border-nexova-teal focus:ring-4 focus:ring-teal-100">
+                    <option value="">Selecciona un país</option>
+                    <option value="AR">Argentina</option>
+                    <option value="BO">Bolivia</option>
+                    <option value="BR">Brasil</option>
+                    <option value="CA">Canadá</option>
+                    <option value="CL">Chile</option>
+                    <option value="CN">China</option>
+                    <option value="CO">Colombia</option>
+                    <option value="CR">Costa Rica</option>
+                    <option value="CU">Cuba</option>
+                    <option value="DO">República Dominicana</option>
+                    <option value="EC">Ecuador</option>
+                    <option value="SV">El Salvador</option>
+                    <option value="FR">Francia</option>
+                    <option value="DE">Alemania</option>
+                    <option value="GT">Guatemala</option>
+                    <option value="HN">Honduras</option>
+                    <option value="IN">India</option>
+                    <option value="IE">Irlanda</option>
+                    <option value="IT">Italia</option>
+                    <option value="JP">Japón</option>
+                    <option value="MX">México</option>
+                    <option value="NI">Nicaragua</option>
+                    <option value="PA">Panamá</option>
+                    <option value="PY">Paraguay</option>
+                    <option value="PE">Perú</option>
+                    <option value="PT">Portugal</option>
+                    <option value="ES">España</option>
+                    <option value="GB">Reino Unido</option>
+                    <option value="US">Estados Unidos</option>
+                    <option value="UY">Uruguay</option>
+                    <option value="VE">Venezuela</option>
+                    <option value="OTHER">Otro</option>
+                  </select>
+                  <p id="country-error" class="field-error mt-2 hidden text-sm font-medium text-rose-700" aria-live="polite"></p>
                 </div>
                 <div>
                   <label for="birth-date" class="block text-sm font-semibold text-slate-700">Fecha de nacimiento</label>

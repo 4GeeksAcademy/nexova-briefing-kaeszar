@@ -13,8 +13,6 @@
   const allowedExtensions = new Set(["pdf", "doc", "docx"]);
   const phonePattern = /^\+\d[\d\s().-]*$/;
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-  const birthDate = form.elements.namedItem("birthDate");
-  const availabilityDate = form.elements.namedItem("availabilityDate");
   const cvInput = form.elements.namedItem("cv");
 
   const fields = Array.from(form.querySelectorAll("input, select, textarea")).filter(
@@ -64,17 +62,13 @@
       case "area":
         if (!field.value) return "Selecciona el área profesional que más te interesa.";
         break;
-      case "experienceYears":
-        if (field.validity.badInput || field.value === "") return "Indica tus años de experiencia.";
-        if (!Number.isInteger(Number(field.value))) return "Los años de experiencia deben ser un número entero.";
-        if (field.validity.rangeUnderflow || Number(field.value) < 0) return "La experiencia no puede ser inferior a 0 años.";
-        if (field.validity.rangeOverflow || Number(field.value) > 60) return "La experiencia no puede superar los 60 años.";
+      case "experienceRange":
+        if (!field.value) return "Selecciona tu rango de años de experiencia.";
         break;
       case "englishLevel":
         if (!field.value) return "Selecciona tu nivel de inglés.";
         break;
-      case "availabilityDate":
-        if (field.value && field.validity.badInput) return "Introduce una fecha de disponibilidad válida.";
+      case "availability":
         break;
       case "coverLetter":
         if (field.value.length > 2000) return "El texto no puede superar los 2.000 caracteres.";
@@ -146,8 +140,6 @@
     field.addEventListener("input", () => {
       hideStatusMessages();
       if (field.getAttribute("aria-invalid") === "true") validateField(field);
-      if (field === birthDate && availabilityDate?.value) validateField(availabilityDate);
-      if (field === availabilityDate && birthDate?.value) validateField(birthDate);
     });
     field.addEventListener("change", () => {
       if (preserveSuccessOnReset) {

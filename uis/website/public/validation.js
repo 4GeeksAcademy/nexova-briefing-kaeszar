@@ -11,7 +11,7 @@
   let showResetNotice = false;
   const maxCvSize = 5 * 1024 * 1024;
   const allowedExtensions = new Set(["pdf", "doc", "docx"]);
-  const phonePattern = /^[+()\d][\d\s().-]{6,28}$/;
+  const phonePattern = /^\+\d[\d\s().-]*$/;
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   const birthDate = form.elements.namedItem("birthDate");
   const availabilityDate = form.elements.namedItem("availabilityDate");
@@ -46,12 +46,15 @@
         break;
       case "phone": {
         const digits = field.value.replace(/\D/g, "");
-        if (!phonePattern.test(field.value.trim()) || digits.length < 7 || digits.length > 15) return "Introduce un teléfono válido con código de país si corresponde (entre 7 y 15 dígitos).";
+        if (!phonePattern.test(field.value.trim()) || digits.length < 7 || digits.length > 15) return "Incluye + y el código internacional; el teléfono debe contener entre 7 y 15 dígitos.";
         break;
       }
-      case "location":
-        if (field.validity.tooShort) return "Indica una ciudad y un país (al menos 2 caracteres).";
-        if (field.validity.tooLong) return "La ubicación no puede superar los 120 caracteres.";
+      case "city":
+        if (field.validity.tooShort) return "La ciudad debe tener al menos 2 caracteres.";
+        if (field.validity.tooLong) return "La ciudad no puede superar los 80 caracteres.";
+        break;
+      case "country":
+        if (!field.value) return "Selecciona tu país de residencia.";
         break;
       case "birthDate":
         if (field.value && field.validity.badInput) return "Introduce una fecha de nacimiento válida.";

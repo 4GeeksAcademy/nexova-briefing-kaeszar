@@ -134,8 +134,8 @@
             <p class="mt-1">Revisa los campos indicados y vuelve a intentarlo.</p>
           </div>
           <div id="form-success" class="mb-6 hidden rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-sm text-emerald-900" role="status" aria-live="polite" tabindex="-1">
-            <p class="font-semibold">¡Gracias por tu interés en Nexova!</p>
-            <p class="mt-1">Tus datos son válidos. El envío está simulado y todavía no se ha conectado a un sistema de recepción.</p>
+            <p class="font-semibold">Validación completada.</p>
+            <p class="mt-1">Esta demostración no envía ni almacena tu información.</p>
           </div>
           <div id="form-reset-notice" class="mb-6 hidden rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900" role="status" aria-live="polite" tabindex="-1">
             <p class="font-semibold">Formulario limpio.</p>
@@ -276,8 +276,11 @@
               </div>
               <div class="mt-5">
                 <label for="cover-letter" class="block text-sm font-semibold text-slate-700">Cuéntanos sobre tu experiencia</label>
-                <textarea id="cover-letter" name="coverLetter" rows="5" maxlength="2000" placeholder="Resume tu experiencia, tus fortalezas y el tipo de oportunidad que buscas (máximo 2.000 caracteres)." aria-describedby="cover-letter-hint cover-letter-error" class="form-control mt-2 block w-full resize-y rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-base leading-6 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-nexova-teal focus:ring-4 focus:ring-teal-100"></textarea>
-                <p id="cover-letter-hint" class="mt-2 text-xs text-slate-500">Campo opcional. No incluyas información personal sensible.</p>
+                <textarea id="cover-letter" name="coverLetter" rows="5" maxlength="500" placeholder="Resume tu experiencia, tus fortalezas y el tipo de oportunidad que buscas (máximo 500 caracteres)." aria-describedby="cover-letter-hint cover-letter-counter cover-letter-error" class="form-control mt-2 block w-full resize-y rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-base leading-6 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-nexova-teal focus:ring-4 focus:ring-teal-100"></textarea>
+                <div class="mt-2 flex flex-wrap items-start justify-between gap-x-4 gap-y-1 text-xs text-slate-500">
+                  <p id="cover-letter-hint">Campo opcional. No incluyas información personal sensible.</p>
+                  <p id="cover-letter-counter" class="shrink-0" aria-live="polite">0/500 caracteres</p>
+                </div>
                 <p id="cover-letter-error" class="field-error mt-2 hidden text-sm font-medium text-rose-700" aria-live="polite"></p>
               </div>
               <div class="mt-5">
@@ -291,7 +294,7 @@
             <div class="mt-8 border-t border-slate-200 pt-7">
               <div class="flex items-start gap-3">
                 <input id="privacy-consent" name="privacyConsent" type="checkbox" required aria-describedby="privacy-consent-error" class="mt-1 h-5 w-5 shrink-0 rounded border-slate-300 text-nexova-teal focus:ring-4 focus:ring-teal-100" />
-                <label for="privacy-consent" class="text-sm leading-6 text-slate-600">Autorizo a Nexova Solutions a utilizar los datos proporcionados para gestionar esta aplicación y contactarme sobre oportunidades profesionales. <span class="font-semibold text-rose-700" aria-hidden="true">*</span></label>
+                <label for="privacy-consent" class="text-sm leading-6 text-slate-600">Entiendo que esta demostración no envía ni almacena mis datos. <span class="font-semibold text-rose-700" aria-hidden="true">*</span></label>
               </div>
               <p id="privacy-consent-error" class="field-error ml-8 mt-2 hidden text-sm font-medium text-rose-700" aria-live="polite"></p>
             </div>
@@ -302,7 +305,7 @@
                 Enviar aplicación <span aria-hidden="true">→</span>
               </button>
             </div>
-            <p class="mt-4 text-center text-xs leading-5 text-slate-500">El envío es una demostración de validación; tus datos no se almacenan ni se transmiten.</p>
+            <p class="mt-4 text-center text-xs leading-5 text-slate-500">Demostración: la información introducida no se transmite ni se guarda.</p>
           </form>
         </div>
       </section>

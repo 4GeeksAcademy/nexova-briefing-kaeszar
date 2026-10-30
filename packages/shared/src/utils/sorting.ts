@@ -43,8 +43,8 @@ export function sortByCriteria<Item>(
   criteria: readonly SortCriterion<Item>[],
 ): Item[] {
   return items.toSorted
-    ? items.toSorted((left, right) => compareItems(left, right, criteria))
-    : [...items].sort((left, right) => compareItems(left, right, criteria));
+    ? items.toSorted((left: Item, right: Item): number => compareItems(left, right, criteria))
+    : [...items].sort((left: Item, right: Item): number => compareItems(left, right, criteria));
 }
 
 function compareItems<Item>(

@@ -18,7 +18,10 @@ export function sumBy<Item>(
   items: readonly Item[],
   getValue: (item: Item) => number,
 ): number {
-  return items.reduce((total, item) => total + getValue(item), 0);
+  return items.reduce(
+    (total: number, item: Item): number => total + getValue(item),
+    0,
+  );
 }
 
 /** Returns the arithmetic mean, or undefined when the collection is empty. */

@@ -27,7 +27,8 @@ export function filterByCriteria<Item>(
       const value = item[key];
 
       if (typeof criterion === "function") {
-        return criterion(value, item);
+        const predicate = criterion as (value: Item[typeof key], item: Item) => boolean;
+        return predicate(value, item);
       }
 
       return Object.is(value, criterion);

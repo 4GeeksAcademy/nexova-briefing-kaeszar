@@ -4,3 +4,4 @@ export * from "./utils/aggregations";
 export * from "./utils/collections";
 export * from "./utils/search";
 export * from "./utils/sorting";
+export * from "./utils/validations";

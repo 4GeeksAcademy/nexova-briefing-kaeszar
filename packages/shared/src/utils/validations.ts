@@ -78,7 +78,7 @@ export function validateNexovaCompany(value: unknown): BusinessValidationResult 
   } else {
     for (const [city, country] of [["Valencia", "Spain"], ["Miami", "United States"]]) {
       const found = offices.some(
-        (office) => isRecord(office) && office.city === city && office.country === country,
+        (office: unknown): boolean => isRecord(office) && office.city === city && office.country === country,
       );
       if (!found) {
         issues.push({ path: "offices", message: `Debe incluir la oficina de ${city}, ${country}.` });
@@ -101,7 +101,9 @@ export function validateDepartment(value: unknown): BusinessValidationResult {
     return createResult([{ path: "", message: "Debe ser un objeto de departamento." }]);
   }
 
-  const rule = DEPARTMENT_RULES.find((department) => department.name === value.name);
+  const rule = DEPARTMENT_RULES.find(
+    (department: (typeof DEPARTMENT_RULES)[number]): boolean => department.name === value.name,
+  );
   if (!rule) {
     issues.push({ path: "name", message: "El nombre no corresponde a un departamento del briefing." });
     return createResult(issues);
@@ -175,7 +177,7 @@ export function validateTrainingProgram(value: unknown): BusinessValidationResul
   if (!TRAINING_FORMATS.includes(value.format as (typeof TRAINING_FORMATS)[number])) {
     issues.push({ path: "format", message: "El formato debe ser Course, Workshop o Webinar." });
   }
-  if (!Array.isArray(value.topics) || value.topics.some((topic) => typeof topic !== "string")) {
+  if (!Array.isArray(value.topics) || value.topics.some((topic: unknown): boolean => typeof topic !== "string")) {
     issues.push({ path: "topics", message: "Los temas deben ser una lista de textos." });
   }
 

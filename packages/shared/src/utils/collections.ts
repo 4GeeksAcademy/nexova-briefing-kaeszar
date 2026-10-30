@@ -21,8 +21,8 @@ export function filterByCriteria<Item>(
 ): Item[] {
   const criterionKeys = Object.keys(criteria) as Array<keyof Item>;
 
-  return items.filter((item) =>
-    criterionKeys.every((key) => {
+  return items.filter((item: Item): boolean =>
+    criterionKeys.every((key: keyof Item): boolean => {
       const criterion = criteria[key] as FieldCriterion<Item[typeof key], Item>;
       const value = item[key];
 

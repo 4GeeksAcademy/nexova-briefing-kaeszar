@@ -1,2 +1,3 @@
-/** Public entry point for shared Nexova domain types. */
+/** Public entry point for shared Nexova models and utilities. */
 export * from "./types/models";
+export * from "./utils/collections";

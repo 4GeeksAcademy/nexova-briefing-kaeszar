@@ -112,7 +112,7 @@ export function validateDepartment(value: unknown): BusinessValidationResult {
   if ("headcount" in rule && value.headcount !== rule.headcount) {
     issues.push({ path: "headcount", message: `El briefing indica ${rule.headcount} personas para este departamento.` });
   }
-  if (rule.lead && (!isRecord(value.lead) || value.lead.fullName !== rule.lead)) {
+  if ("lead" in rule && (!isRecord(value.lead) || value.lead.fullName !== rule.lead)) {
     issues.push({ path: "lead", message: `El responsable indicado en el briefing es ${rule.lead}.` });
   }
 

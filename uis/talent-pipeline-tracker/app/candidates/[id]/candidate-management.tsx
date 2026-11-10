@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { Candidate, CandidateNote } from "@/lib/api";
 import { addCandidateNote, deleteCandidateNote, updateCandidate } from "@/lib/api";
 
@@ -33,6 +34,7 @@ function formatDate(value: string) {
 }
 
 export default function CandidateManagement({ candidate: initialCandidate, initialNotes, notesError }: CandidateManagementProps) {
+  const router = useRouter();
   const [candidate, setCandidate] = useState(initialCandidate);
   const [notes, setNotes] = useState(initialNotes);
   const [noteContent, setNoteContent] = useState("");
@@ -54,6 +56,7 @@ export default function CandidateManagement({ candidate: initialCandidate, initi
       const updatedCandidate = await updateCandidate(candidate.id, { [field]: value });
       setCandidate(updatedCandidate);
       setSuccessMessage(field === "status" ? "Estado actualizado." : "Etapa actualizada.");
+      router.refresh();
     } catch (error) {
       setCandidate((current) => ({ ...current, [field]: previousValue }));
       setErrorMessage(error instanceof Error ? error.message : "No se pudo actualizar la candidatura.");
@@ -78,6 +81,7 @@ export default function CandidateManagement({ candidate: initialCandidate, initi
       setNoteContent("");
       setNotesLoadError(null);
       setSuccessMessage("Nota añadida.");
+      router.refresh();
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "No se pudo añadir la nota.");
     } finally {
@@ -95,6 +99,7 @@ export default function CandidateManagement({ candidate: initialCandidate, initi
       setNotes((current) => current.filter((note) => note.id !== noteId));
       setCandidate((current) => ({ ...current, notes_count: Math.max(0, current.notes_count - 1) }));
       setSuccessMessage("Nota eliminada.");
+      router.refresh();
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "No se pudo eliminar la nota.");
     } finally {

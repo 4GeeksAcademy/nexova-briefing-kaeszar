@@ -44,36 +44,25 @@ export default async function CandidateDetailPage({
   }
   const returnHref = returnParams.size ? `/?${returnParams.toString()}` : "/";
   let candidate;
+  let candidateError: string | null = null;
 
   try {
     candidate = await getCandidate(id);
   } catch (error) {
     const message = error instanceof Error ? error.message : "No se pudo cargar la candidatura.";
     if (message.includes("No se encontró")) notFound();
-
-    return (
-      <main className="min-h-screen bg-slate-50 px-4 py-10 text-slate-900 sm:px-8">
-        <div className="mx-auto max-w-3xl">
-          <Link href={returnHref} className="font-semibold text-teal-800 hover:underline">
-            ← Volver al listado
-          </Link>
-          <section role="alert" className="mt-6 rounded-xl border border-rose-200 bg-rose-50 p-6 text-rose-900">
-            <h1 className="font-semibold">No se pudo cargar la candidatura</h1>
-            <p className="mt-1 text-sm">{message}</p>
-            <p className="mt-3 text-sm">Vuelve a intentarlo más tarde.</p>
-          </section>
-        </div>
-      </main>
-    );
+    candidateError = message;
   }
 
   let initialNotes: CandidateNote[] = [];
   let notesError: string | null = null;
-  try {
-    const response = await getCandidateNotes(id);
-    initialNotes = response.data;
-  } catch (error) {
-    notesError = error instanceof Error ? error.message : "No se pudieron cargar las notas.";
+  if (candidate) {
+    try {
+      const response = await getCandidateNotes(id);
+      initialNotes = response.data;
+    } catch (error) {
+      notesError = error instanceof Error ? error.message : "No se pudieron cargar las notas.";
+    }
   }
 
   return (
@@ -86,6 +75,14 @@ export default async function CandidateDetailPage({
           ← Volver al listado
         </Link>
 
+        {candidateError ? (
+          <section role="alert" className="mt-6 rounded-xl border border-rose-200 bg-rose-50 p-6 text-rose-900">
+            <h1 className="font-semibold">No se pudo cargar la candidatura</h1>
+            <p className="mt-1 text-sm">{candidateError}</p>
+            <p className="mt-3 text-sm">Vuelve a intentarlo más tarde.</p>
+          </section>
+        ) : candidate ? (
+          <>
         <header className="mt-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Detalle de candidatura</p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight">{candidate.full_name}</h1>
@@ -148,6 +145,8 @@ export default async function CandidateDetailPage({
           <h2 id="edit-candidate-heading" className="mb-5 text-lg font-semibold">Editar datos de la candidatura</h2>
           <CandidateForm candidate={candidate} />
         </section>
+          </>
+        ) : null}
       </div>
     </main>
   );

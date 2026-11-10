@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import CandidateManagement from "./candidate-management";
+import CandidateForm from "@/app/candidate-form";
 import { getCandidate, getCandidateNotes } from "@/lib/api";
 import type { CandidateNote } from "@/lib/api";
 
@@ -142,6 +143,11 @@ export default async function CandidateDetailPage({
         </section>
 
         <CandidateManagement candidate={candidate} initialNotes={initialNotes} notesError={notesError} />
+
+        <section aria-labelledby="edit-candidate-heading" className="mt-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <h2 id="edit-candidate-heading" className="mb-5 text-lg font-semibold">Editar datos de la candidatura</h2>
+          <CandidateForm candidate={candidate} />
+        </section>
       </div>
     </main>
   );

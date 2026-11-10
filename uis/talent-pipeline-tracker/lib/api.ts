@@ -28,6 +28,16 @@ type CandidateNotesResponse = {
 
 export type CandidateUpdate = Pick<Candidate, "status" | "stage">;
 
+export type CandidateFormData = {
+  full_name: string;
+  email: string;
+  phone: string;
+  position: string;
+  linkedin_url: string | null;
+  cv_url: string | null;
+  experience_years: number;
+};
+
 type CandidateListResponse = {
   total: number;
   page: number;
@@ -84,6 +94,22 @@ export async function getCandidates(): Promise<CandidateListResponse> {
 
 export async function getCandidate(id: string): Promise<Candidate> {
   return fetchApi<Candidate>(`/records/${encodeURIComponent(id)}`);
+}
+
+export async function createCandidate(candidate: CandidateFormData): Promise<Candidate> {
+  return fetchApi<Candidate>("/records", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(candidate),
+  });
+}
+
+export async function replaceCandidate(id: string, candidate: CandidateFormData): Promise<Candidate> {
+  return fetchApi<Candidate>(`/records/${encodeURIComponent(id)}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(candidate),
+  });
 }
 
 export async function updateCandidate(id: string, updates: Partial<CandidateUpdate>): Promise<Candidate> {

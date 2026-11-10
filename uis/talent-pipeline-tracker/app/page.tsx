@@ -1,4 +1,5 @@
 import CandidatesListBoundary from "./candidates-list-boundary";
+import Link from "next/link";
 import { getCandidates } from "@/lib/api";
 
 export default async function HomePage() {
@@ -27,6 +28,12 @@ export default async function HomePage() {
           <p className="mt-2 text-slate-600">
             Consulta las candidaturas y su estado actual en el proceso de selección.
           </p>
+          <Link
+            href="/candidates/new"
+            className="mt-5 inline-flex rounded-lg bg-teal-800 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-800"
+          >
+            Registrar candidatura
+          </Link>
         </header>
 
         {errorMessage ? (

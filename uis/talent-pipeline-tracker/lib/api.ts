@@ -14,6 +14,30 @@ export type Candidate = {
   updated_at: string;
 };
 
+export type CandidateNote = {
+  id: string;
+  record_id: string;
+  content: string;
+  created_at: string;
+};
+
+type CandidateNotesResponse = {
+  data: CandidateNote[];
+  meta: { total: number };
+};
+
+export type CandidateUpdate = Pick<Candidate, "status" | "stage">;
+
+export type CandidateFormData = {
+  full_name: string;
+  email: string;
+  phone: string;
+  position: string;
+  linkedin_url: string | null;
+  cv_url: string | null;
+  experience_years: number;
+};
+
 type CandidateListResponse = {
   total: number;
   page: number;
@@ -25,11 +49,11 @@ const API_BASE_URL = (
   process.env.NEXT_PUBLIC_API_URL ?? "https://playground.4geeks.com/tracker/api/v1"
 ).replace(/\/$/, "");
 
-async function fetchApi<T>(path: string): Promise<T> {
+async function fetchApi<T>(path: string, init?: RequestInit): Promise<T> {
   let response: Response;
 
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, { cache: "no-store" });
+    response = await fetch(`${API_BASE_URL}${path}`, { cache: "no-store", ...init });
   } catch {
     throw new Error("No se pudo conectar con la API. Comprueba tu conexión e inténtalo de nuevo.");
   }
@@ -70,4 +94,55 @@ export async function getCandidates(): Promise<CandidateListResponse> {
 
 export async function getCandidate(id: string): Promise<Candidate> {
   return fetchApi<Candidate>(`/records/${encodeURIComponent(id)}`);
+}
+
+export async function createCandidate(candidate: CandidateFormData): Promise<Candidate> {
+  return fetchApi<Candidate>("/records", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(candidate),
+  });
+}
+
+export async function replaceCandidate(id: string, candidate: CandidateFormData): Promise<Candidate> {
+  return fetchApi<Candidate>(`/records/${encodeURIComponent(id)}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(candidate),
+  });
+}
+
+export async function updateCandidate(id: string, updates: Partial<CandidateUpdate>): Promise<Candidate> {
+  return fetchApi<Candidate>(`/records/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updates),
+  });
+}
+
+export async function getCandidateNotes(id: string): Promise<CandidateNotesResponse> {
+  return fetchApi<CandidateNotesResponse>(`/records/${encodeURIComponent(id)}/notes`);
+}
+
+export async function addCandidateNote(id: string, content: string): Promise<CandidateNote> {
+  return fetchApi<CandidateNote>(`/records/${encodeURIComponent(id)}/notes`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content }),
+  });
+}
+
+export async function deleteCandidateNote(id: string, noteId: string): Promise<void> {
+  const path = `/records/${encodeURIComponent(id)}/notes/${encodeURIComponent(noteId)}`;
+  let response: Response;
+
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, { method: "DELETE", cache: "no-store" });
+  } catch {
+    throw new Error("No se pudo conectar con la API. Comprueba tu conexión e inténtalo de nuevo.");
+  }
+
+  if (!response.ok) {
+    throw new Error(`La API respondió con un error (${response.status}). Inténtalo de nuevo más tarde.`);
+  }
 }

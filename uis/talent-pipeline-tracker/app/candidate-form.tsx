@@ -34,8 +34,34 @@ const emptyValues: FormValues = {
   experience_years: "",
 };
 
+const positionOptions = [
+  "Tecnología de la Información",
+  "Recursos Humanos",
+  "Administración",
+  "Logística",
+  "Operaciones",
+  "Ventas",
+  "Marketing y Comunicación",
+  "Atención al Cliente",
+  "Finanzas y Contabilidad",
+  "Formación",
+  "Otro",
+];
+
+const experienceOptions = [
+  { value: "0", label: "De 0 a 3 años" },
+  { value: "3", label: "De 3 a 10 años" },
+  { value: "10", label: "De 10 a 15 años" },
+  { value: "15", label: "De 15 a 20 años" },
+  { value: "21", label: "Más de 20 años" },
+];
+
 function valuesFromCandidate(candidate?: Candidate): FormValues {
   if (!candidate) return emptyValues;
+
+  const experienceRange = [...experienceOptions]
+    .reverse()
+    .find(({ value }) => candidate.experience_years >= Number(value));
 
   return {
     full_name: candidate.full_name,
@@ -44,7 +70,7 @@ function valuesFromCandidate(candidate?: Candidate): FormValues {
     position: candidate.position,
     linkedin_url: candidate.linkedin_url ?? "",
     cv_url: candidate.cv_url ?? "",
-    experience_years: String(candidate.experience_years),
+    experience_years: experienceRange?.value ?? "0",
   };
 }
 
@@ -74,10 +100,7 @@ function validate(values: FormValues): FormErrors {
   else if (position.length > 200) errors.position = "El puesto no puede superar los 200 caracteres.";
 
   if (values.experience_years.trim() === "") errors.experience_years = "Los años de experiencia son obligatorios.";
-  else {
-    const experience = Number(values.experience_years);
-    if (!Number.isFinite(experience) || experience < 0) errors.experience_years = "Los años de experiencia deben ser un número igual o mayor que cero.";
-  }
+  else if (!experienceOptions.some(({ value }) => value === values.experience_years)) errors.experience_years = "Selecciona un rango de experiencia válido.";
 
   for (const [field, label] of [["linkedin_url", "LinkedIn"], ["cv_url", "CV"]] as const) {
     const value = values[field].trim();
@@ -204,37 +227,44 @@ export default function CandidateForm({ candidate, onSuccess }: CandidateFormPro
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="text-sm font-medium text-slate-700">
           Nombre completo <span aria-hidden="true">*</span>
-          <input id="candidate-full-name" className={inputClassName} name="full_name" autoComplete="name" value={values.full_name} onChange={(event) => updateValue("full_name", event.target.value)} onBlur={(event) => validateField("full_name", event.target.value)} required minLength={2} maxLength={200} aria-invalid={Boolean(errors.full_name)} aria-describedby={errors.full_name ? "candidate-full-name-error" : undefined} disabled={isSubmitting} />
+          <input id="candidate-full-name" className={inputClassName} name="full_name" autoComplete="name" placeholder="Ej.: Ana García López" value={values.full_name} onChange={(event) => updateValue("full_name", event.target.value)} onBlur={(event) => validateField("full_name", event.target.value)} required minLength={2} maxLength={200} aria-invalid={Boolean(errors.full_name)} aria-describedby={errors.full_name ? "candidate-full-name-error" : undefined} disabled={isSubmitting} />
           {errors.full_name && <span id="candidate-full-name-error" className="mt-2 block text-sm font-medium text-rose-700">{errors.full_name}</span>}
         </label>
         <label className="text-sm font-medium text-slate-700">
           Email <span aria-hidden="true">*</span>
-          <input id="candidate-email" className={inputClassName} name="email" type="email" autoComplete="email" inputMode="email" value={values.email} onChange={(event) => updateValue("email", event.target.value)} onBlur={(event) => validateField("email", event.target.value)} required maxLength={254} aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? "candidate-email-error" : undefined} disabled={isSubmitting} />
+          <input id="candidate-email" className={inputClassName} name="email" type="email" autoComplete="email" inputMode="email" placeholder="nombre@ejemplo.com" value={values.email} onChange={(event) => updateValue("email", event.target.value)} onBlur={(event) => validateField("email", event.target.value)} required maxLength={254} aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? "candidate-email-error" : undefined} disabled={isSubmitting} />
           {errors.email && <span id="candidate-email-error" className="mt-2 block text-sm font-medium text-rose-700">{errors.email}</span>}
         </label>
         <label className="text-sm font-medium text-slate-700">
           Teléfono <span aria-hidden="true">*</span>
-          <input id="candidate-phone" className={inputClassName} name="phone" type="tel" autoComplete="tel" inputMode="tel" placeholder="+34 600 000 000" value={values.phone} onChange={(event) => updateValue("phone", event.target.value)} onBlur={(event) => validateField("phone", event.target.value)} required maxLength={30} aria-invalid={Boolean(errors.phone)} aria-describedby={errors.phone ? "candidate-phone-error" : undefined} disabled={isSubmitting} />
+          <input id="candidate-phone" className={inputClassName} name="phone" type="tel" autoComplete="tel" inputMode="tel" placeholder="Obligatorio: +34 600 000 000" value={values.phone} onChange={(event) => updateValue("phone", event.target.value)} onBlur={(event) => validateField("phone", event.target.value)} required maxLength={30} aria-invalid={Boolean(errors.phone)} aria-describedby={errors.phone ? "candidate-phone-error" : undefined} disabled={isSubmitting} />
           {errors.phone && <span id="candidate-phone-error" className="mt-2 block text-sm font-medium text-rose-700">{errors.phone}</span>}
         </label>
         <label className="text-sm font-medium text-slate-700">
           Puesto <span aria-hidden="true">*</span>
-          <input id="candidate-position" className={inputClassName} name="position" value={values.position} onChange={(event) => updateValue("position", event.target.value)} onBlur={(event) => validateField("position", event.target.value)} required maxLength={200} aria-invalid={Boolean(errors.position)} aria-describedby={errors.position ? "candidate-position-error" : undefined} disabled={isSubmitting} />
+          <select id="candidate-position" className={inputClassName} name="position" value={values.position} onChange={(event) => updateValue("position", event.target.value)} onBlur={(event) => validateField("position", event.target.value)} required aria-invalid={Boolean(errors.position)} aria-describedby={errors.position ? "candidate-position-error" : undefined} disabled={isSubmitting}>
+            <option value="">Selecciona un área profesional</option>
+            {values.position && !positionOptions.includes(values.position) && <option value={values.position}>{values.position}</option>}
+            {positionOptions.map((position) => <option key={position} value={position}>{position}</option>)}
+          </select>
           {errors.position && <span id="candidate-position-error" className="mt-2 block text-sm font-medium text-rose-700">{errors.position}</span>}
         </label>
         <label className="text-sm font-medium text-slate-700">
           Enlace a LinkedIn
-          <input id="candidate-linkedin" className={inputClassName} name="linkedin_url" type="url" inputMode="url" placeholder="https://…" value={values.linkedin_url} onChange={(event) => updateValue("linkedin_url", event.target.value)} onBlur={(event) => validateField("linkedin_url", event.target.value)} maxLength={2048} aria-invalid={Boolean(errors.linkedin_url)} aria-describedby={errors.linkedin_url ? "candidate-linkedin-error" : undefined} disabled={isSubmitting} />
+          <input id="candidate-linkedin" className={inputClassName} name="linkedin_url" type="url" inputMode="url" placeholder="https://www.linkedin.com/in/tu-perfil" value={values.linkedin_url} onChange={(event) => updateValue("linkedin_url", event.target.value)} onBlur={(event) => validateField("linkedin_url", event.target.value)} maxLength={2048} aria-invalid={Boolean(errors.linkedin_url)} aria-describedby={errors.linkedin_url ? "candidate-linkedin-error" : undefined} disabled={isSubmitting} />
           {errors.linkedin_url && <span id="candidate-linkedin-error" className="mt-2 block text-sm font-medium text-rose-700">{errors.linkedin_url}</span>}
         </label>
         <label className="text-sm font-medium text-slate-700">
           Enlace al CV
-          <input id="candidate-cv-url" className={inputClassName} name="cv_url" type="url" inputMode="url" placeholder="https://…" value={values.cv_url} onChange={(event) => updateValue("cv_url", event.target.value)} onBlur={(event) => validateField("cv_url", event.target.value)} maxLength={2048} aria-invalid={Boolean(errors.cv_url)} aria-describedby={errors.cv_url ? "candidate-cv-url-error" : undefined} disabled={isSubmitting} />
+          <input id="candidate-cv-url" className={inputClassName} name="cv_url" type="url" inputMode="url" placeholder="https://ejemplo.com/mi-cv.pdf" value={values.cv_url} onChange={(event) => updateValue("cv_url", event.target.value)} onBlur={(event) => validateField("cv_url", event.target.value)} maxLength={2048} aria-invalid={Boolean(errors.cv_url)} aria-describedby={errors.cv_url ? "candidate-cv-url-error" : undefined} disabled={isSubmitting} />
           {errors.cv_url && <span id="candidate-cv-url-error" className="mt-2 block text-sm font-medium text-rose-700">{errors.cv_url}</span>}
         </label>
         <label className="text-sm font-medium text-slate-700 sm:max-w-xs">
           Años de experiencia <span aria-hidden="true">*</span>
-          <input id="candidate-experience" className={inputClassName} name="experience_years" type="number" min="0" step="0.1" value={values.experience_years} onChange={(event) => updateValue("experience_years", event.target.value)} onBlur={(event) => validateField("experience_years", event.target.value)} required aria-invalid={Boolean(errors.experience_years)} aria-describedby={errors.experience_years ? "candidate-experience-error" : undefined} disabled={isSubmitting} />
+          <select id="candidate-experience" className={inputClassName} name="experience_years" value={values.experience_years} onChange={(event) => updateValue("experience_years", event.target.value)} onBlur={(event) => validateField("experience_years", event.target.value)} required aria-invalid={Boolean(errors.experience_years)} aria-describedby={errors.experience_years ? "candidate-experience-error" : undefined} disabled={isSubmitting}>
+            <option value="">Selecciona tu experiencia</option>
+            {experienceOptions.map(({ value, label }) => <option key={value} value={value}>{label}</option>)}
+          </select>
           {errors.experience_years && <span id="candidate-experience-error" className="mt-2 block text-sm font-medium text-rose-700">{errors.experience_years}</span>}
         </label>
       </div>

@@ -1,49 +1,28 @@
-export type Candidate = {
-  id: string;
-  full_name: string;
-  email: string;
-  phone: string;
-  position: string;
-  linkedin_url: string | null;
-  cv_url: string | null;
-  status: string;
-  stage: string;
-  experience_years: number;
-  notes_count: number;
-  applied_at: string;
-  updated_at: string;
-};
+import type {
+  Candidate,
+  CandidateCreate,
+  CandidateCreateResponse,
+  CandidateListResponse,
+  CandidateNoteCreate,
+  CandidateNoteCreateResponse,
+  CandidateNoteDeleteResponse,
+  CandidateNotesResponse,
+  CandidateUpdate,
+  CandidateUpdateResponse,
+} from "@/types/candidate";
 
-export type CandidateNote = {
-  id: string;
-  record_id: string;
-  content: string;
-  created_at: string;
-};
-
-type CandidateNotesResponse = {
-  data: CandidateNote[];
-  meta: { total: number };
-};
-
-export type CandidateUpdate = Pick<Candidate, "status" | "stage">;
-
-export type CandidateFormData = {
-  full_name: string;
-  email: string;
-  phone: string;
-  position: string;
-  linkedin_url: string | null;
-  cv_url: string | null;
-  experience_years: number;
-};
-
-type CandidateListResponse = {
-  total: number;
-  page: number;
-  limit: number;
-  data: Candidate[];
-};
+export type {
+  Candidate,
+  CandidateCreate as CandidateFormData,
+  CandidateCreateResponse,
+  CandidateListResponse,
+  CandidateNote,
+  CandidateNoteCreateResponse,
+  CandidateNoteDeleteResponse,
+  CandidateNotesResponse,
+  CandidateUpdate,
+  CandidateUpdateResponse,
+} from "@/types/candidate";
 
 const API_BASE_URL = (
   process.env.NEXT_PUBLIC_API_URL ?? "https://playground.4geeks.com/tracker/api/v1"
@@ -96,24 +75,24 @@ export async function getCandidate(id: string): Promise<Candidate> {
   return fetchApi<Candidate>(`/records/${encodeURIComponent(id)}`);
 }
 
-export async function createCandidate(candidate: CandidateFormData): Promise<Candidate> {
-  return fetchApi<Candidate>("/records", {
+export async function createCandidate(candidate: CandidateCreate): Promise<CandidateCreateResponse> {
+  return fetchApi<CandidateCreateResponse>("/records", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(candidate),
   });
 }
 
-export async function replaceCandidate(id: string, candidate: CandidateFormData): Promise<Candidate> {
-  return fetchApi<Candidate>(`/records/${encodeURIComponent(id)}`, {
+export async function replaceCandidate(id: string, candidate: CandidateCreate): Promise<CandidateUpdateResponse> {
+  return fetchApi<CandidateUpdateResponse>(`/records/${encodeURIComponent(id)}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(candidate),
   });
 }
 
-export async function updateCandidate(id: string, updates: Partial<CandidateUpdate>): Promise<Candidate> {
-  return fetchApi<Candidate>(`/records/${encodeURIComponent(id)}`, {
+export async function updateCandidate(id: string, updates: CandidateUpdate): Promise<CandidateUpdateResponse> {
+  return fetchApi<CandidateUpdateResponse>(`/records/${encodeURIComponent(id)}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(updates),
@@ -124,15 +103,16 @@ export async function getCandidateNotes(id: string): Promise<CandidateNotesRespo
   return fetchApi<CandidateNotesResponse>(`/records/${encodeURIComponent(id)}/notes`);
 }
 
-export async function addCandidateNote(id: string, content: string): Promise<CandidateNote> {
-  return fetchApi<CandidateNote>(`/records/${encodeURIComponent(id)}/notes`, {
+export async function addCandidateNote(id: string, content: string): Promise<CandidateNoteCreateResponse> {
+  const note: CandidateNoteCreate = { content };
+  return fetchApi<CandidateNoteCreateResponse>(`/records/${encodeURIComponent(id)}/notes`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ content }),
+    body: JSON.stringify(note),
   });
 }
 
-export async function deleteCandidateNote(id: string, noteId: string): Promise<void> {
+export async function deleteCandidateNote(id: string, noteId: string): Promise<CandidateNoteDeleteResponse> {
   const path = `/records/${encodeURIComponent(id)}/notes/${encodeURIComponent(noteId)}`;
   let response: Response;
 

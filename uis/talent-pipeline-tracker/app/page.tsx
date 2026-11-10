@@ -1,4 +1,4 @@
-import CandidatesListBoundary from "./candidates-list-boundary";
+import CandidatesListBoundary from "@/components/candidates-list-boundary";
 import Link from "next/link";
 import { getCandidates } from "@/lib/api";
 

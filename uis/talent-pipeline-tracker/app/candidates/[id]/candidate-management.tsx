@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Candidate, CandidateNote } from "@/lib/api";
+import type { Candidate, CandidateNote } from "@/types/candidate";
 import { addCandidateNote, deleteCandidateNote, updateCandidate } from "@/lib/api";
 
 const statusOptions = [

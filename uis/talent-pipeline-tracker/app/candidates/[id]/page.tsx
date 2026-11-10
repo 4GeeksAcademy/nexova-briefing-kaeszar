@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import CandidateManagement from "./candidate-management";
-import CandidateForm from "@/app/candidate-form";
+import CandidateForm from "@/components/candidate-form";
 import { getCandidate, getCandidateNotes } from "@/lib/api";
-import type { CandidateNote } from "@/lib/api";
+import type { CandidateNote } from "@/types/candidate";
 
 const statusLabels: Record<string, string> = {
   received: "Recibida",

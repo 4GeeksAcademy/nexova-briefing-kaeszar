@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import CandidatesList from "./candidates-list";
-import type { Candidate } from "@/lib/api";
+import type { Candidate } from "@/types/candidate";
 
 type CandidatesListBoundaryProps = {
   candidates: Candidate[];

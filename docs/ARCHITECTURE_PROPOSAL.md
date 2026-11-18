@@ -1,10 +1,11 @@
 # Documento de Arquitectura de Software
+
 ## Nexova Solutions — Backend
 
 **Versión:** 1.0  
 **Estado:** Arquitectura inicial aprobada  
 **Stack principal:** Python + FastAPI + uv  
-**Patrón arquitectónico:** Arquitectura por capas organizada por dominios  
+**Patrón arquitectónico:** Aplicación monolítica modular, por capas y organizada por dominios
 **Versión de API:** v1
 
 ---
@@ -24,7 +25,7 @@ Su objetivo es establecer una base técnica compartida que permita:
 
 También documenta las decisiones técnicas, sus motivos y las consecuencias que pueden tener a medida que el proyecto crezca.
 
-La arquitectura está diseñada para una primera etapa de desarrollo, con un equipo reducido y priorizando la entrega de funcionalidades reales.
+La propuesta está pensada para el equipo de Tecnología e Infraestructura de seis personas y para una primera etapa de construcción de una plataforma común, priorizando la entrega progresiva de funcionalidades reales.
 
 ## 2. Contexto del proyecto
 
@@ -45,19 +46,17 @@ Estos dominios tienen responsabilidades diferentes, pero forman parte de una mis
 
 ### Consideraciones iniciales
 
-- El sistema comenzará como una aplicación backend única.
-- Los dominios estarán organizados de forma independiente a nivel de código.
-- La comunicación entre frontend y backend se realizará mediante API REST.
-- El backend utilizará FastAPI.
-- La gestión de dependencias y ejecución se realizará con uv.
-- La persistencia de datos se incorporará progresivamente.
-- Las funcionalidades de inteligencia artificial se integrarán cuando existan casos de uso definidos.
+- Nexova tiene 120 empleados, opera en España y Estados Unidos y presta servicios de selección, soporte externalizado y formación corporativa.
+- Las áreas de negocio dependen de herramientas desconectadas (HubSpot, Zendesk, ATS propio y Google Workspace), hojas de cálculo y tareas manuales.
+- El sistema comenzará como una aplicación backend única, organizada por dominios y consumida por aplicaciones frontend separadas mediante API REST.
+- FastAPI expondrá los servicios; `uv` gestionará dependencias y ejecución.
+- Persistencia, autenticación y otras capacidades se incorporarán al definir los requisitos funcionales que las necesiten.
 
 ## 3. Decisión arquitectónica
 
 ### 3.1 Patrón elegido
 
-**Arquitectura por capas (Layered Architecture) con organización por dominios (Domain-Based Organization).**
+**Aplicación monolítica modular: arquitectura por capas organizada por dominios (Domain-Based Organization).**
 
 La estructura interna de cada dominio seguirá tres responsabilidades principales:
 
@@ -73,43 +72,27 @@ La respuesta recorrerá el camino inverso.
 
 ### 3.2 ¿Por qué se eligió este patrón?
 
-Se evaluó una arquitectura modular más sofisticada basada en principios de arquitectura hexagonal.
+La decisión responde a las características concretas de Nexova, no a una preferencia genérica:
 
-Sin embargo, para la etapa actual, se decidió comenzar con una estructura más sencilla.
+1. **Una plataforma común para varias áreas:** Recruitment es el núcleo del negocio; Sales, HR, Training y Support tienen procesos y datos propios, mientras que Executive necesita información consolidada. La organización por dominios mantiene esas responsabilidades identificables dentro de un backend único.
+2. **Integración antes que distribución:** las herramientas actuales están fragmentadas. Un backend común permite centralizar gradualmente la comunicación con HubSpot, Zendesk, Google Workspace y el ATS, sin introducir desde el comienzo el coste operativo de varios servicios desplegables.
+3. **Equipo de seis personas:** el equipo de Tecnología e Infraestructura necesita límites y convenciones claros, pero no una red de servicios o abstracciones difícil de operar para esta etapa.
+4. **Separación útil para los flujos reales:** routers, servicios y acceso a datos permiten trabajar y probar cambios por responsabilidad, manteniendo la lógica de selección, atención al cliente y formación fuera de los endpoints HTTP.
+5. **Evolución guiada por evidencia:** si un dominio requiere despliegue o escalado separado, podrá extraerse más adelante sin convertir esa complejidad en requisito inicial.
 
-Los motivos son:
-
-**1. Menor complejidad inicial**
-
-Una arquitectura con múltiples abstracciones, interfaces, puertos, adaptadores y capas adicionales puede introducir costes de mantenimiento antes de que exista una necesidad real.
-
-**2. Equipo reducido**
-
-Actualmente el desarrollo está a cargo de dos participantes. La arquitectura debe facilitar la comprensión y modificación del código sin exigir una estructura organizativa compleja.
-
-**3. Separación de responsabilidades**
-
-Aunque sea sencilla, la arquitectura mantiene separadas las rutas HTTP, la lógica de negocio y el acceso a datos.
-
-**4. Organización por áreas funcionales**
-
-Cada dominio tiene sus propios módulos. Esto evita concentrar toda la lógica de la aplicación en unos pocos archivos.
-
-**5. Evolución progresiva**
-
-Si un dominio adquiere mayor complejidad, podrá incorporar nuevas capas o abstraer sus dependencias sin obligar a rediseñar toda la aplicación.
+MVC no se propone como patrón principal porque el backend expondrá una API para clientes frontend independientes, no renderizará vistas de usuario. Serverless podría ser adecuado para tareas puntuales o cargas variables, pero aún no hay requisitos de ejecución o despliegue que justifiquen basar toda la plataforma en ese modelo. Se reconsiderará para casos concretos, no por anticipación.
 
 ### 3.3 Consecuencias de la decisión
 
-| Aspecto | Consecuencia |
-|---|---|
-| Desarrollo inicial | Menor coste de implementación |
-| Mantenimiento | Responsabilidades más claras |
-| Incorporación de funcionalidades | Cada dominio puede evolucionar de manera independiente |
-| Testing | Servicios y acceso a datos pueden probarse por separado |
-| Escalabilidad | Permite aumentar recursos de la aplicación completa |
-| Complejidad | Menor que una arquitectura hexagonal completa |
-| Independencia de módulos | Depende de respetar los límites entre dominios |
+| Aspecto                          | Consecuencia                                                                                      |
+| -------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Desarrollo inicial               | Menor coste operativo que distribuir desde el comienzo la aplicación en varios servicios          |
+| Mantenimiento                    | Responsabilidades más claras                                                                      |
+| Incorporación de funcionalidades | Cada dominio puede evolucionar de manera independiente                                            |
+| Testing                          | Servicios y acceso a datos pueden probarse por separado                                           |
+| Escalabilidad                    | Permite escalar inicialmente la aplicación completa; no ofrece escalado independiente por dominio |
+| Complejidad                      | Menor que una arquitectura hexagonal completa                                                     |
+| Independencia de módulos         | Depende de respetar los límites entre dominios                                                    |
 
 **Decisión:** mantener una aplicación única organizada por dominios, sin introducir microservicios ni abstracciones innecesarias.
 
@@ -118,7 +101,7 @@ Si un dominio adquiere mayor complejidad, podrá incorporar nuevas capas o abstr
 La siguiente estructura constituye la organización inicial aprobada.
 
 ```text
-nexova-backend/
+services/api/                         # Ubicación del backend en el monorepo
 │
 ├── app/
 │   │
@@ -135,41 +118,49 @@ nexova-backend/
 │   │   │
 │   │   ├── recruitment/
 │   │   │   ├── router.py
+│   │   │   ├── schemas.py
 │   │   │   ├── service.py
 │   │   │   └── data.py
 │   │   │
 │   │   ├── sales/
 │   │   │   ├── router.py
+│   │   │   ├── schemas.py
 │   │   │   ├── service.py
 │   │   │   └── data.py
 │   │   │
 │   │   ├── hr/
 │   │   │   ├── router.py
+│   │   │   ├── schemas.py
 │   │   │   ├── service.py
 │   │   │   └── data.py
 │   │   │
 │   │   ├── training/
 │   │   │   ├── router.py
+│   │   │   ├── schemas.py
 │   │   │   ├── service.py
 │   │   │   └── data.py
 │   │   │
 │   │   ├── support/
 │   │   │   ├── router.py
+│   │   │   ├── schemas.py
 │   │   │   ├── service.py
 │   │   │   └── data.py
 │   │   │
 │   │   ├── marketing/
 │   │   │   ├── router.py
+│   │   │   ├── schemas.py
 │   │   │   ├── service.py
 │   │   │   └── data.py
 │   │   │
 │   │   ├── executive/
 │   │   │   ├── router.py
+│   │   │   ├── schemas.py
 │   │   │   ├── service.py
 │   │   │   └── data.py
 │   │   │
 │   │   └── integrations/
 │   │       ├── router.py
+│   │       ├── schemas.py
 │   │       ├── service.py
 │   │       └── data.py
 │   │
@@ -185,6 +176,8 @@ nexova-backend/
 ├── uv.lock
 └── README.md
 ```
+
+La estructura es la propuesta lógica del backend; en este monorepo corresponde al servicio ubicado en `services/api/`. Las interfaces de usuario se mantienen en `uis/` y no importan módulos internos del backend.
 
 ### 4.1 Directorio `app/`
 
@@ -297,20 +290,26 @@ Responsabilidades:
 
 No debe contener reglas de negocio ni lógica de presentación.
 
+**`schemas.py` — Contratos de la API**
+
+Define los modelos Pydantic de entrada y salida usados por los endpoints. Cuando se incorpore una base de datos, los modelos de persistencia deberán mantenerse diferenciados de estos esquemas: tienen propósitos distintos y no deben confundirse.
+
 ### 4.6 Responsabilidades de los dominios
 
-| Dominio | Responsabilidad principal |
-|---|---|
-| `recruitment/` | Candidatos, procesos de selección, evaluaciones y seguimiento |
-| `sales/` | Clientes potenciales, oportunidades, pipeline y actividad comercial |
-| `hr/` | Empleados, onboarding, vacaciones y procesos internos |
-| `training/` | Cursos, alumnos, inscripciones y formación corporativa |
-| `support/` | Tickets, SLA, atención al cliente y base de conocimiento |
-| `marketing/` | Contenidos, campañas, métricas y comunicación |
-| `executive/` | Indicadores, informes y vistas consolidadas para dirección |
+| Dominio         | Responsabilidad principal                                            |
+| --------------- | -------------------------------------------------------------------- |
+| `recruitment/`  | Candidatos, procesos de selección, evaluaciones y seguimiento        |
+| `sales/`        | Clientes potenciales, oportunidades, pipeline y actividad comercial  |
+| `hr/`           | Empleados, onboarding, vacaciones y procesos internos                |
+| `training/`     | Cursos, alumnos, inscripciones y formación corporativa               |
+| `support/`      | Tickets, SLA, atención al cliente y base de conocimiento             |
+| `marketing/`    | Contenidos, campañas, métricas y comunicación                        |
+| `executive/`    | Indicadores, informes y vistas consolidadas para dirección           |
 | `integrations/` | Comunicación con HubSpot, Zendesk, Google Workspace y otros sistemas |
 
 **Regla:** un dominio debe ser responsable de sus propias reglas y datos. Los demás dominios deben interactuar mediante interfaces de servicio explícitas, no accediendo directamente a sus módulos internos de datos.
+
+Los dominios se delimitan según las áreas y procesos reales de Nexova. `executive` presenta información consolidada, pero no se convierte en propietario de los datos de las otras áreas; `integrations` encapsula la comunicación con sistemas externos.
 
 ### 4.7 Directorio `shared/`
 
@@ -343,13 +342,13 @@ La estructura de pruebas deberá acompañar el crecimiento de los dominios.
 
 ### 4.9 Archivos de configuración
 
-| Archivo | Responsabilidad |
-|---|---|
-| `.env.example` | Documentar las variables de entorno necesarias sin incluir secretos reales |
-| `.gitignore` | Excluir archivos locales, entornos virtuales y secretos |
-| `pyproject.toml` | Configuración del proyecto y dependencias |
-| `uv.lock` | Fijar las versiones resueltas de las dependencias |
-| `README.md` | Documentar instalación, ejecución y uso del backend |
+| Archivo          | Responsabilidad                                                            |
+| ---------------- | -------------------------------------------------------------------------- |
+| `.env.example`   | Documentar las variables de entorno necesarias sin incluir secretos reales |
+| `.gitignore`     | Excluir archivos locales, entornos virtuales y secretos                    |
+| `pyproject.toml` | Configuración del proyecto y dependencias                                  |
+| `uv.lock`        | Fijar las versiones resueltas de las dependencias                          |
+| `README.md`      | Documentar instalación, ejecución y uso del backend                        |
 
 ## 5. Organización de rutas y dominios
 
@@ -361,37 +360,18 @@ Prefijo general:
 
 Cada dominio tendrá su propio prefijo.
 
-| Dominio | Prefijo |
-|---|---|
-| Recruitment | `/api/v1/recruitment` |
-| Sales | `/api/v1/sales` |
-| HR | `/api/v1/hr` |
-| Training | `/api/v1/training` |
-| Support | `/api/v1/support` |
-| Marketing | `/api/v1/marketing` |
-| Executive | `/api/v1/executive` |
+| Dominio      | Prefijo                |
+| ------------ | ---------------------- |
+| Recruitment  | `/api/v1/recruitment`  |
+| Sales        | `/api/v1/sales`        |
+| HR           | `/api/v1/hr`           |
+| Training     | `/api/v1/training`     |
+| Support      | `/api/v1/support`      |
+| Marketing    | `/api/v1/marketing`    |
+| Executive    | `/api/v1/executive`    |
 | Integrations | `/api/v1/integrations` |
 
-### Ejemplos de endpoints futuros
-
-```text
-GET    /api/v1/recruitment/candidates
-POST   /api/v1/recruitment/candidates
-GET    /api/v1/recruitment/candidates/{id}
-
-GET    /api/v1/sales/opportunities
-POST   /api/v1/sales/opportunities
-
-GET    /api/v1/hr/employees
-GET    /api/v1/training/courses
-GET    /api/v1/support/tickets
-GET    /api/v1/marketing/campaigns
-GET    /api/v1/executive/dashboard
-
-POST   /api/v1/integrations/hubspot/sync
-```
-
-Estos endpoints son ejemplos de diseño, no funcionalidades ya implementadas ni contratos definitivos.
+Las rutas representan recursos y operaciones del dominio, no nombres de implementación. Por ejemplo, `GET /api/v1/recruitment/candidates` y `POST /api/v1/recruitment/candidates` pertenecerían a Recruitment; `GET /api/v1/sales/opportunities` a Sales; `GET /api/v1/hr/employees` a HR; `GET /api/v1/training/courses` a Training; `GET /api/v1/support/tickets` a Support; `GET /api/v1/marketing/campaigns` a Marketing; `GET /api/v1/executive/dashboard` a Executive; y `POST /api/v1/integrations/hubspot/sync` a Integrations. Son rutas ilustrativas, no contratos definitivos.
 
 ### 5.1 Registro de routers
 
@@ -414,402 +394,48 @@ FastAPI generará automáticamente la documentación en:
 - `/redoc`: documentación ReDoc.
 - `/openapi.json`: esquema OpenAPI.
 
-**Punto técnico importante:** un `APIRouter` sin endpoints puede estar registrado en la aplicación, pero no aparecerá como grupo visible en Swagger UI.
+**Punto técnico importante:** un `APIRouter` sin endpoints puede estar registrado en la aplicación, pero no aparecerá como grupo visible en Swagger UI. En la etapa inicial se verificará el registro de routers sin inventar endpoints de negocio.
 
-Si se necesita que cada dominio aparezca en `/docs` desde el comienzo, habrá que incorporar al menos un endpoint provisional documentado por dominio. Si se decide mantener routers completamente vacíos, la validación deberá comprobar su registro mediante la configuración de la aplicación, no mediante su visibilidad como sección en Swagger.
+### 5.3 Convenciones de FastAPI que influyen en la propuesta
 
-## 6. Flujo de procesamiento de una solicitud
+FastAPI no impone una única estructura de carpetas. Su documentación recomienda dividir aplicaciones grandes en módulos y usar `APIRouter` para agrupar endpoints, incluyéndolos desde un router principal. En proyectos habituales también se separan configuración, esquemas Pydantic, dependencias y acceso a datos.
 
-Ejemplo conceptual: consultar los candidatos de Recruitment.
+Esta propuesta adopta esas prácticas y agrega la organización por dominios para que el equipo encuentre juntas las funciones de cada área. No se crea una capa adicional por cada concepto mientras no tenga una responsabilidad real: `router.py` gestiona HTTP, `schemas.py` los contratos, `service.py` las reglas y `data.py` la persistencia. El router central compone los módulos; no contiene lógica de negocio.
 
-```text
-Frontend
-   |
-   | HTTP Request
-   v
-FastAPI
-   |
-   v
-recruitment/router.py
-   |
-   | Valida entrada y parámetros
-   v
-recruitment/service.py
-   |
-   | Ejecuta reglas de negocio
-   v
-recruitment/data.py
-   |
-   | Consulta información
-   v
-Base de datos
-   |
-   v
-Data → Service → Router
-   |
-   v
-HTTP Response
-```
+### 5.4 Separación entre frontend y backend
 
-### ¿Por qué separar estas responsabilidades?
+El backend y las interfaces son aplicaciones separadas aunque residan en el mismo monorepo. Se comunican exclusivamente mediante contratos HTTP versionados (`/api/v1`); el frontend no accede directamente a la base de datos ni importa módulos Python del backend. Mantenerlos en repositorios distintos también sería posible sin cambiar este límite de integración.
 
-Permite modificar una parte del sistema sin afectar necesariamente las demás.
+Cada aplicación tendrá configuración propia por entorno. El frontend recibirá la URL base de la API como configuración y no contendrá secretos. Las credenciales de base de datos e integraciones externas solo estarán disponibles en el backend, mediante variables de entorno o un gestor de secretos. Se versionará un `.env.example` sin valores secretos.
 
-Ejemplo:
+Como frontend y backend pueden servirse desde orígenes distintos, FastAPI configurará CORS con una lista explícita de orígenes permitidos: orígenes locales necesarios en desarrollo y dominios aprobados en producción. No se habilitará cualquier origen por defecto. CORS no reemplaza autenticación ni autorización; el backend debe verificar permisos en cada operación protegida.
 
-Si cambia la forma de almacenar candidatos, se puede modificar la capa `data.py` sin trasladar consultas SQL a los endpoints.
+## 6. Decisiones técnicas iniciales
 
-Si cambia una regla de negocio, se modifica `service.py` sin alterar la exposición HTTP.
+| Decisión                     | Propuesta inicial                                                 | Motivo / límite                                                                                                                                         |
+| ---------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Estilo de aplicación         | Monolito modular por dominios                                     | Integra las áreas sin coste de despliegue distribuido prematuro.                                                                                        |
+| Framework y ejecución        | FastAPI + `uv`                                                    | FastAPI ofrece routers y documentación OpenAPI; `uv` gestiona dependencias y ejecución reproducible.                                                    |
+| Contrato entre sistemas      | API REST versionada bajo `/api/v1`                                | Mantiene desacoplados los frontends y el backend.                                                                                                       |
+| Validación                   | Esquemas Pydantic por dominio                                     | Separa contratos de entrada/salida de reglas de negocio y persistencia.                                                                                 |
+| Configuración                | Variables de entorno y `.env.example` sin secretos                | Permite configuración por entorno sin credenciales en el repositorio ni en el frontend.                                                                 |
+| CORS                         | Lista explícita de orígenes por entorno                           | Permite los frontends previstos sin abrir el API a cualquier origen.                                                                                    |
+| Persistencia y autenticación | Elegir antes de operar con datos reales                           | PostgreSQL/ORM, autenticación, permisos y aislamiento entre organizaciones requieren requisitos concretos; Recruitment y HR contienen datos personales. |
+| Tareas asíncronas            | No añadir cola/workers hasta que exista un proceso largo definido | Evita infraestructura sin caso de uso; procesamiento de CVs, sincronizaciones y analítica se evaluarán cuando se implementen.                           |
+| Integraciones                | Encapsular adaptadores externos en `integrations`                 | HubSpot, Zendesk, Google Workspace y el ATS son sistemas existentes que pueden fallar o cambiar.                                                        |
 
-Si cambia una ruta, se modifica `router.py` sin duplicar la lógica de negocio.
+## 7. Riesgos si no se sigue la estructura
 
-## 7. Convenciones de desarrollo
+| Riesgo                                                  | Qué puede salir mal                                                                                   | Prevención                                                                                       |
+| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Routers contienen negocio o acceso directo a datos      | Cambios de API, reglas y persistencia se mezclan; aumentan duplicación y dificultad para probar.      | Mantener el flujo router → service → data y probar servicios por separado.                       |
+| Dominios acceden a datos internos de otros dominios     | Una modificación en Recruitment puede romper Sales o Executive y bloquear la evolución independiente. | Colaborar mediante servicios/contratos explícitos; preservar la propiedad de datos por dominio.  |
+| Configuración frontend/backend o CORS demasiado abierta | Secretos expuestos en cliente o llamadas web permitidas desde orígenes no aprobados.                  | Separar variables de entorno y permitir solo orígenes conocidos; CORS no reemplaza autorización. |
+| Integraciones externas consideradas infalibles          | Caídas, límites o cambios de APIs producen solicitudes bloqueadas y datos inconsistentes.             | Definir timeouts, manejo de errores y reintentos cuando se implemente cada integración.          |
 
-Para mantener la consistencia del proyecto se establecen las siguientes reglas.
+## 8. Referencias técnicas
 
-### 7.1 Imports absolutos
-
-Se utilizarán imports absolutos desde el paquete `app`.
-
-Ejemplo:
-
-```python
-from app.domains.recruitment.service import CandidateService
-```
-
-Evitar imports relativos como:
-
-```python
-from .service import CandidateService
-```
-
-Esto permite identificar claramente el origen de cada dependencia.
-
-### 7.2 Prevención de dependencias circulares
-
-Se establecen estas reglas:
-
-- Los routers pueden depender de los servicios de su dominio.
-- Los servicios pueden depender de la capa de datos.
-- La capa de datos no debe depender de los routers.
-- Los dominios no deben importar directamente los módulos internos de datos de otros dominios.
-- Los componentes compartidos no deben depender de dominios concretos.
-- `main.py` debe limitarse a la inicialización y composición de la aplicación.
-
-Si dos dominios necesitan colaborar, la comunicación debe realizarse mediante servicios o contratos explícitos.
-
-### 7.3 Nomenclatura
-
-Se utilizará:
-
-- `snake_case` para archivos, funciones y variables.
-- `PascalCase` para clases.
-- Nombres descriptivos para endpoints y servicios.
-- Un lenguaje de dominio consistente para los modelos y operaciones.
-
-### 7.4 Validación de datos
-
-Los datos recibidos desde el exterior deben validarse antes de ejecutar operaciones de negocio.
-
-Se utilizarán modelos de Pydantic para validar solicitudes y estructurar respuestas.
-
-La validación de entrada no reemplaza las verificaciones de permisos ni las reglas de negocio.
-
-## 8. Gestión del entorno y ejecución
-
-El proyecto utilizará `uv` para administrar dependencias y ejecutar la aplicación.
-
-### Comandos principales
-
-Inicialización:
-
-```bash
-uv init --bare
-```
-
-Instalación de dependencias iniciales:
-
-```bash
-uv add fastapi "uvicorn[standard]"
-```
-
-Sincronización del entorno:
-
-```bash
-uv sync
-```
-
-Ejecución en desarrollo:
-
-```bash
-uv run uvicorn app.main:app --reload
-```
-
-La aplicación estará disponible en:
-
-```text
-http://127.0.0.1:8000
-```
-
-Documentación:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-El archivo `uv.lock` deberá mantenerse actualizado y versionado para asegurar entornos reproducibles.
-
-## 9. Seguridad y protección de datos
-
-Nexova gestionará información personal de candidatos, empleados y clientes.
-
-Por este motivo, la seguridad debe considerarse desde las primeras funcionalidades que procesen datos reales.
-
-### Riesgos identificados
-
-**9.1 Datos personales y RGPD**
-
-Los datos de candidatos y empleados pueden incluir información personal sensible.
-
-Se deberá contemplar:
-
-- Minimización de datos.
-- Finalidad del tratamiento.
-- Control de acceso.
-- Retención y eliminación.
-- Registro de operaciones relevantes.
-- Gestión de solicitudes de acceso y supresión cuando corresponda.
-
-**9.2 Autenticación y autorización**
-
-La autenticación deberá incorporarse antes de exponer funcionalidades privadas.
-
-La autorización deberá controlar:
-
-- Rol del usuario.
-- Dominio al que puede acceder.
-- Recurso específico.
-- Organización o contexto empresarial cuando corresponda.
-
-No alcanza con ocultar botones en el frontend. El backend debe verificar los permisos en cada operación protegida.
-
-**9.3 Secretos y variables de entorno**
-
-Las credenciales de servicios externos y bases de datos no deben almacenarse en el código fuente.
-
-Se utilizarán variables de entorno y, cuando el despliegue lo requiera, un gestor de secretos.
-
-**9.4 Archivos y CV**
-
-Los documentos deben almacenarse fuera del sistema de archivos público de la aplicación.
-
-Se deberán contemplar:
-
-- Validación de formato y tamaño.
-- Restricciones de acceso.
-- Análisis de archivos.
-- URLs temporales o mecanismos equivalentes de descarga autorizada.
-- Protección contra archivos maliciosos.
-
-**Decisión:** estas medidas se implementarán antes de habilitar el procesamiento de datos reales y no se considerarán opcionales para producción.
-
-## 10. Integraciones externas
-
-El dominio `integrations` centralizará las comunicaciones con servicios externos.
-
-Integraciones previstas:
-
-- HubSpot.
-- Zendesk.
-- Google Workspace.
-- ATS existente.
-- Otros servicios que se incorporen posteriormente.
-
-### Riesgos
-
-- Caídas de servicios externos.
-- Límites de solicitudes (rate limits).
-- Cambios en APIs.
-- Errores de autenticación.
-- Datos duplicados.
-- Sincronizaciones incompletas.
-- Inconsistencias entre sistemas.
-
-### Criterios técnicos
-
-Las integraciones deberán contemplar:
-
-- Timeouts.
-- Manejo de errores.
-- Reintentos controlados.
-- Registro de operaciones.
-- Protección de credenciales.
-- Idempotencia en operaciones que puedan repetirse.
-- Control de sincronización.
-
-No se debe asumir que una solicitud externa siempre tendrá éxito.
-
-## 11. Procesamiento asíncrono e inteligencia artificial
-
-Algunas operaciones de Nexova podrían requerir más tiempo de procesamiento que una solicitud HTTP convencional.
-
-Ejemplos:
-
-- Extracción de información de CV.
-- Clasificación y análisis de candidatos.
-- Sincronización con HubSpot.
-- Procesamiento de tickets.
-- Generación de informes.
-- Procesamiento documental mediante IA.
-
-Estas tareas no deberían bloquear innecesariamente las solicitudes HTTP.
-
-**Decisión inicial:** no introducir una infraestructura de workers antes de tener un caso de uso concreto que lo justifique.
-
-Cuando sea necesario, se evaluará una solución de procesamiento asíncrono, incorporando colas, workers y mecanismos de seguimiento de tareas.
-
-Las decisiones automatizadas que puedan afectar oportunidades laborales deberán contar con supervisión humana y controles adecuados.
-
-## 12. Riesgos arquitectónicos y puntos de atención
-
-| Riesgo | Consecuencia posible | Medida preventiva |
-|---|---|---|
-| Servicios demasiado grandes | Dificultad de mantenimiento | Dividir por responsabilidades |
-| Dependencias entre dominios | Acoplamiento excesivo | Comunicación mediante servicios explícitos |
-| Consultas sin índices | Lentitud con grandes volúmenes | Revisar consultas y medir rendimiento |
-| Falta de autorización | Exposición de datos | Validación de permisos en backend |
-| Integraciones inestables | Errores y datos inconsistentes | Timeouts, reintentos e idempotencia |
-| Procesos largos en HTTP | Bloqueo de solicitudes | Incorporar workers cuando corresponda |
-| Datos duplicados | Inconsistencias | Definir reglas de identidad y sincronización |
-| Crecimiento del código | Módulos difíciles de mantener | Revisar límites de cada dominio |
-| Falta de observabilidad | Diagnóstico lento | Logging, métricas y trazabilidad |
-
-### 12.1 Límites de la arquitectura elegida
-
-La arquitectura por capas es adecuada para comenzar, pero no resuelve automáticamente todos los problemas de escalabilidad.
-
-A medida que crezca el sistema podrían aparecer:
-
-- Servicios con demasiadas responsabilidades.
-- Dependencias cruzadas entre dominios.
-- Consultas complejas.
-- Procesos de larga duración.
-- Necesidad de aislar cargas específicas.
-- Requerimientos de despliegue independiente.
-
-Esto no significa que debamos anticipar una migración.
-
-Significa que debemos monitorear estos indicadores y evolucionar la arquitectura cuando exista evidencia suficiente.
-
-## 13. Estrategia de evolución
-
-La arquitectura se desarrollará progresivamente.
-
-### Etapa 1 — Fundación
-
-- Crear la estructura de carpetas.
-- Configurar FastAPI y uv.
-- Registrar los ocho routers.
-- Configurar el sistema de excepciones.
-- Establecer convenciones de imports.
-- Verificar `/docs`.
-
-### Etapa 2 — Persistencia
-
-- Incorporar PostgreSQL.
-- Definir modelos y relaciones.
-- Implementar migraciones.
-- Implementar la capa de datos.
-- Incorporar tests de persistencia.
-
-### Etapa 3 — Seguridad
-
-- Implementar autenticación.
-- Implementar autorización.
-- Definir roles y permisos.
-- Proteger recursos y documentos.
-- Incorporar auditoría de operaciones relevantes.
-
-### Etapa 4 — Funcionalidades principales
-
-- Implementar los servicios de cada dominio.
-- Exponer endpoints.
-- Integrar el frontend.
-- Incorporar pruebas automatizadas.
-
-### Etapa 5 — Integraciones e IA
-
-- Integrar sistemas externos.
-- Incorporar procesamiento asíncrono.
-- Desarrollar funcionalidades de IA.
-- Implementar controles de supervisión humana.
-
-### Etapa 6 — Optimización
-
-- Medir rendimiento.
-- Analizar consultas.
-- Incorporar caché cuando sea necesario.
-- Mejorar observabilidad.
-- Evaluar necesidades de escalabilidad.
-
-## 14. Criterios de aceptación de la arquitectura inicial
-
-La primera implementación de la estructura se considerará válida cuando:
-
-- [ ] El proyecto pueda instalarse mediante `uv sync`.
-- [ ] FastAPI pueda iniciarse mediante `uv run`.
-- [ ] `main.py` mantenga únicamente responsabilidades de inicialización.
-- [ ] Los ocho dominios estén creados.
-- [ ] Cada dominio tenga `router.py`, `service.py` y `data.py`.
-- [ ] Los routers estén registrados centralmente.
-- [ ] Se utilicen imports absolutos.
-- [ ] No existan dependencias circulares.
-- [ ] La aplicación exponga la documentación OpenAPI.
-- [ ] Los routers estén registrados y puedan verificarse.
-- [ ] No se haya introducido lógica de negocio prematuramente.
-
-**Nota:** para que los ocho dominios sean visibles como grupos en Swagger UI deberán disponer de al menos un endpoint documentado. Si se mantienen vacíos, su registro se verificará mediante la configuración de la aplicación.
-
-## 15. Decisiones pendientes
-
-Las siguientes decisiones no forman parte de la estructura inicial y deberán definirse antes de implementar las funcionalidades correspondientes:
-
-| Tema | Decisión pendiente |
-|---|---|
-| Base de datos | PostgreSQL y estrategia de migraciones |
-| ORM | Selección de tecnología de persistencia |
-| Autenticación | Estrategia de sesiones o tokens |
-| Autorización | Modelo de roles y permisos |
-| Multi-tenancy | Determinar alcance y aislamiento entre organizaciones |
-| Archivos | Proveedor de almacenamiento documental |
-| Procesamiento asíncrono | Tecnología de colas y workers |
-| IA | Proveedores, modelos y estrategia de integración |
-| Observabilidad | Logging, métricas y trazabilidad |
-| Deployment | Infraestructura y estrategia de despliegue |
-
-Estas decisiones deberán tomarse en función de los requisitos concretos, no por anticipación.
-
-## 16. Conclusión
-
-Nexova Solutions comenzará con una arquitectura backend basada en FastAPI, organizada por dominios y estructurada en tres capas: router, service y data.
-
-La decisión prioriza:
-
-- Simplicidad.
-- Claridad.
-- Separación de responsabilidades.
-- Bajo coste de mantenimiento.
-- Velocidad de desarrollo.
-- Evolución progresiva.
-
-No se incorporarán microservicios ni patrones arquitectónicos complejos mientras no exista una necesidad técnica que los justifique.
-
-La arquitectura debe acompañar el crecimiento del producto, no convertirse en un obstáculo para construirlo.
-
-**Principio rector del proyecto:**
-
-> Construir lo necesario hoy, mantener la calidad técnica y dejar preparada una evolución razonable para mañana.
-
----
-***Recomendación técnica
-Hay una decisión que conviene no postergar demasiado: definir el modelo de autenticación, autorización y aislamiento de datos entre organizaciones antes de implementar Recruitment y HR con información real. Son áreas especialmente sensibles de Nexova.***
+- FastAPI, _Bigger Applications — Multiple Files_: https://fastapi.tiangolo.com/tutorial/bigger-applications/
+- FastAPI, _CORS (Cross-Origin Resource Sharing)_: https://fastapi.tiangolo.com/tutorial/cors/
+- FastAPI, _Settings and Environment Variables_: https://fastapi.tiangolo.com/advanced/settings/
+- The Twelve-Factor App, _Config_: https://12factor.net/config

@@ -31,18 +31,21 @@ La propuesta está pensada para el equipo de Tecnología e Infraestructura de se
 
 Nexova Solutions necesita desarrollar una plataforma que centralice diferentes áreas operativas del negocio.
 
-El backend deberá atender ocho dominios funcionales:
+El backend organizará sus funcionalidades alrededor de seis dominios de negocio:
 
 1. Recruitment: gestión de selección y candidatos.
 2. Sales: ventas y desarrollo comercial.
 3. HR: gestión de recursos humanos.
 4. Training: formación corporativa.
-5. Support: soporte y atención al cliente.
+5. Support: prestación de servicios de soporte y atención al cliente.
 6. Marketing: marketing y comunicación.
-7. Executive: información y funcionalidades para dirección.
-8. Integrations: comunicación con sistemas externos.
 
-Estos dominios tienen responsabilidades diferentes, pero forman parte de una misma plataforma empresarial.
+Estos dominios tienen responsabilidades y procesos propios, pero forman parte de una misma plataforma empresarial.
+
+### Capacidades transversales
+
+- **Reporting ejecutivo (`executive`):** consolida indicadores de los dominios para apoyar la toma de decisiones; no es propietario de los datos de origen.
+- **Integraciones (`integrations`):** encapsula la comunicación técnica con sistemas externos como HubSpot, Zendesk, Google Workspace y el ATS. No representa una línea de negocio.
 
 ### Consideraciones iniciales
 
@@ -74,9 +77,9 @@ La respuesta recorrerá el camino inverso.
 
 La decisión responde a las características concretas de Nexova, no a una preferencia genérica:
 
-1. **Una plataforma común para varias áreas:** Recruitment es el núcleo del negocio; Sales, HR, Training y Support tienen procesos y datos propios, mientras que Executive necesita información consolidada. La organización por dominios mantiene esas responsabilidades identificables dentro de un backend único.
+1. **Una plataforma común para varias áreas:** Recruitment es el núcleo del negocio; Sales, HR, Training, Support y Marketing tienen procesos propios. Reporting ejecutivo consolida información de esas áreas sin ser propietario de sus datos.
 2. **Integración antes que distribución:** las herramientas actuales están fragmentadas. Un backend común permite centralizar gradualmente la comunicación con HubSpot, Zendesk, Google Workspace y el ATS, sin introducir desde el comienzo el coste operativo de varios servicios desplegables.
-3. **Equipo de seis personas:** el equipo de Tecnología e Infraestructura necesita límites y convenciones claros, pero no una red de servicios o abstracciones difícil de operar para esta etapa.
+3. **Equipo de seis personas:** el equipo de Tecnología e Infraestructura necesita límites y convenciones claros entre dominios y capacidades transversales, pero no una red de servicios o abstracciones difícil de operar para esta etapa.
 4. **Separación útil para los flujos reales:** routers, servicios y acceso a datos permiten trabajar y probar cambios por responsabilidad, manteniendo la lógica de selección, atención al cliente y formación fuera de los endpoints HTTP.
 5. **Evolución guiada por evidencia:** si un dominio requiere despliegue o escalado separado, podrá extraerse más adelante sin convertir esa complejidad en requisito inicial.
 
@@ -152,17 +155,19 @@ services/api/                         # Ubicación del backend en el monorepo
 │   │   │   ├── service.py
 │   │   │   └── data.py
 │   │   │
-│   │   ├── executive/
-│   │   │   ├── router.py
-│   │   │   ├── schemas.py
-│   │   │   ├── service.py
-│   │   │   └── data.py
-│   │   │
-│   │   └── integrations/
+│   │
+│   ├── capabilities/
+│   │   └── executive/
 │   │       ├── router.py
 │   │       ├── schemas.py
 │   │       ├── service.py
 │   │       └── data.py
+│   │
+│   ├── integrations/
+│   │   ├── hubspot/
+│   │   ├── zendesk/
+│   │   ├── google_workspace/
+│   │   └── ats/
 │   │
 │   └── shared/
 │       └── __init__.py
@@ -238,7 +243,7 @@ Centraliza el enrutamiento de la API.
 
 Responsabilidades:
 
-- Importar los routers de los ocho dominios.
+- Importar los routers de los dominios y capacidades HTTP que estén implementados.
 - Asignar el prefijo general `/api/v1`.
 - Registrar los routers en la aplicación.
 - Mantener organizada la exposición de endpoints.
@@ -249,7 +254,7 @@ Esto permite que `main.py` no tenga que conocer los detalles de cada dominio.
 
 Es el núcleo organizativo del backend.
 
-Cada directorio representa un área funcional de Nexova.
+Cada directorio representa un dominio de negocio de Nexova: Recruitment, Sales, HR, Training, Support o Marketing.
 
 Los dominios tienen una estructura común para que cualquier desarrollador pueda identificar rápidamente dónde incorporar una nueva funcionalidad.
 
@@ -294,24 +299,28 @@ No debe contener reglas de negocio ni lógica de presentación.
 
 Define los modelos Pydantic de entrada y salida usados por los endpoints. Cuando se incorpore una base de datos, los modelos de persistencia deberán mantenerse diferenciados de estos esquemas: tienen propósitos distintos y no deben confundirse.
 
-### 4.6 Responsabilidades de los dominios
+### 4.6 Responsabilidades de los dominios de negocio
 
-| Dominio         | Responsabilidad principal                                            |
-| --------------- | -------------------------------------------------------------------- |
-| `recruitment/`  | Candidatos, procesos de selección, evaluaciones y seguimiento        |
-| `sales/`        | Clientes potenciales, oportunidades, pipeline y actividad comercial  |
-| `hr/`           | Empleados, onboarding, vacaciones y procesos internos                |
-| `training/`     | Cursos, alumnos, inscripciones y formación corporativa               |
-| `support/`      | Tickets, SLA, atención al cliente y base de conocimiento             |
-| `marketing/`    | Contenidos, campañas, métricas y comunicación                        |
-| `executive/`    | Indicadores, informes y vistas consolidadas para dirección           |
-| `integrations/` | Comunicación con HubSpot, Zendesk, Google Workspace y otros sistemas |
+| Dominio        | Responsabilidad principal                                           |
+| -------------- | ------------------------------------------------------------------- |
+| `recruitment/` | Candidatos, procesos de selección, evaluaciones y seguimiento       |
+| `sales/`       | Clientes potenciales, oportunidades, pipeline y actividad comercial |
+| `hr/`          | Empleados, onboarding, vacaciones y procesos internos               |
+| `training/`    | Cursos, alumnos, inscripciones y formación corporativa              |
+| `support/`     | Tickets, SLA, atención al cliente y base de conocimiento            |
+| `marketing/`   | Contenidos, campañas, métricas y comunicación                       |
 
 **Regla:** un dominio debe ser responsable de sus propias reglas y datos. Los demás dominios deben interactuar mediante interfaces de servicio explícitas, no accediendo directamente a sus módulos internos de datos.
 
-Los dominios se delimitan según las áreas y procesos reales de Nexova. `executive` presenta información consolidada, pero no se convierte en propietario de los datos de las otras áreas; `integrations` encapsula la comunicación con sistemas externos.
+Los dominios se delimitan según las áreas y procesos reales de Nexova. Las capacidades transversales pueden consultar interfaces explícitas de los dominios, pero no deben apropiarse de sus reglas ni de sus datos.
 
-### 4.7 Directorio `shared/`
+### 4.7 Capacidades transversales
+
+**`capabilities/executive/`** agrupa los casos de uso de reporting ejecutivo. Sus servicios pueden combinar indicadores de varios dominios mediante contratos explícitos; el módulo no es la fuente de verdad de esos datos. Solo tendrá router y endpoints cuando se implementen operaciones consumibles por clientes.
+
+**`integrations/`** contiene adaptadores y clientes para sistemas externos, separados por proveedor. Es una responsabilidad técnica transversal y no un dominio de negocio. Los webhooks u otros endpoints de integración se expondrán solo cuando un flujo concreto los requiera.
+
+### 4.8 Directorio `shared/`
 
 Contiene elementos reutilizables que realmente sean comunes a varios dominios.
 
@@ -326,7 +335,7 @@ No debe utilizarse como depósito de código que no sabemos dónde colocar.
 
 La funcionalidad específica de un dominio debe permanecer dentro de ese dominio.
 
-### 4.8 Directorio `tests/`
+### 4.9 Directorio `tests/`
 
 Contiene las pruebas automatizadas.
 
@@ -340,7 +349,7 @@ Se incorporarán progresivamente:
 
 La estructura de pruebas deberá acompañar el crecimiento de los dominios.
 
-### 4.9 Archivos de configuración
+### 4.10 Archivos de configuración
 
 | Archivo          | Responsabilidad                                                            |
 | ---------------- | -------------------------------------------------------------------------- |
@@ -360,28 +369,28 @@ Prefijo general:
 
 Cada dominio tendrá su propio prefijo.
 
-| Dominio      | Prefijo                |
-| ------------ | ---------------------- |
-| Recruitment  | `/api/v1/recruitment`  |
-| Sales        | `/api/v1/sales`        |
-| HR           | `/api/v1/hr`           |
-| Training     | `/api/v1/training`     |
-| Support      | `/api/v1/support`      |
-| Marketing    | `/api/v1/marketing`    |
-| Executive    | `/api/v1/executive`    |
-| Integrations | `/api/v1/integrations` |
+| Dominio     | Prefijo               |
+| ----------- | --------------------- |
+| Recruitment | `/api/v1/recruitment` |
+| Sales       | `/api/v1/sales`       |
+| HR          | `/api/v1/hr`          |
+| Training    | `/api/v1/training`    |
+| Support     | `/api/v1/support`     |
+| Marketing   | `/api/v1/marketing`   |
 
-Las rutas representan recursos y operaciones del dominio, no nombres de implementación. Por ejemplo, `GET /api/v1/recruitment/candidates` y `POST /api/v1/recruitment/candidates` pertenecerían a Recruitment; `GET /api/v1/sales/opportunities` a Sales; `GET /api/v1/hr/employees` a HR; `GET /api/v1/training/courses` a Training; `GET /api/v1/support/tickets` a Support; `GET /api/v1/marketing/campaigns` a Marketing; `GET /api/v1/executive/dashboard` a Executive; y `POST /api/v1/integrations/hubspot/sync` a Integrations. Son rutas ilustrativas, no contratos definitivos.
+Las rutas representan recursos y operaciones del dominio, no nombres de implementación. Por ejemplo, `GET /api/v1/recruitment/candidates` y `POST /api/v1/recruitment/candidates` pertenecerían a Recruitment; `GET /api/v1/sales/opportunities` a Sales; `GET /api/v1/hr/employees` a HR; `GET /api/v1/training/courses` a Training; `GET /api/v1/support/tickets` a Support; y `GET /api/v1/marketing/campaigns` a Marketing. Son rutas ilustrativas, no contratos definitivos.
+
+Reporting ejecutivo podría exponerse bajo `/api/v1/executive` cuando exista una funcionalidad concreta. Las integraciones no requieren automáticamente un prefijo público: sus endpoints se definirán según cada flujo, por ejemplo webhooks entrantes autenticados cuando corresponda.
 
 ### 5.1 Registro de routers
 
-El archivo `app/api/router.py` será responsable de incluir los routers de todos los dominios.
+El archivo `app/api/router.py` será responsable de incluir los routers de los dominios y de las capacidades que expongan endpoints.
 
 El flujo de registro será:
 
-1. Cada dominio declara su propio `APIRouter`.
-2. El router principal importa los routers de dominio.
-3. El router principal los registra bajo `/api/v1`.
+1. Cada dominio o capacidad HTTP implementada declara su propio `APIRouter`.
+2. El router principal importa los routers disponibles.
+3. El router principal los registra bajo `/api/v1` y sus respectivos prefijos.
 4. `main.py` incluye el router principal en FastAPI.
 
 Esto evita registrar rutas manualmente dentro de `main.py`.
@@ -400,7 +409,7 @@ FastAPI generará automáticamente la documentación en:
 
 FastAPI no impone una única estructura de carpetas. Su documentación recomienda dividir aplicaciones grandes en módulos y usar `APIRouter` para agrupar endpoints, incluyéndolos desde un router principal. En proyectos habituales también se separan configuración, esquemas Pydantic, dependencias y acceso a datos.
 
-Esta propuesta adopta esas prácticas y agrega la organización por dominios para que el equipo encuentre juntas las funciones de cada área. No se crea una capa adicional por cada concepto mientras no tenga una responsabilidad real: `router.py` gestiona HTTP, `schemas.py` los contratos, `service.py` las reglas y `data.py` la persistencia. El router central compone los módulos; no contiene lógica de negocio.
+Esta propuesta adopta esas prácticas y agrega la organización por dominios para que el equipo encuentre juntas las funciones de cada área. Reporting ejecutivo se mantiene como capacidad transversal y las integraciones como adaptadores técnicos, no como dominios de negocio. No se crea una capa adicional por cada concepto mientras no tenga una responsabilidad real: `router.py` gestiona HTTP, `schemas.py` los contratos, `service.py` las reglas y `data.py` el acceso a datos. El router central compone los módulos; no contiene lógica de negocio.
 
 ### 5.4 Separación entre frontend y backend
 
@@ -412,17 +421,17 @@ Como frontend y backend pueden servirse desde orígenes distintos, FastAPI confi
 
 ## 6. Decisiones técnicas iniciales
 
-| Decisión                     | Propuesta inicial                                                 | Motivo / límite                                                                                                                                         |
-| ---------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Estilo de aplicación         | Monolito modular por dominios                                     | Integra las áreas sin coste de despliegue distribuido prematuro.                                                                                        |
-| Framework y ejecución        | FastAPI + `uv`                                                    | FastAPI ofrece routers y documentación OpenAPI; `uv` gestiona dependencias y ejecución reproducible.                                                    |
-| Contrato entre sistemas      | API REST versionada bajo `/api/v1`                                | Mantiene desacoplados los frontends y el backend.                                                                                                       |
-| Validación                   | Esquemas Pydantic por dominio                                     | Separa contratos de entrada/salida de reglas de negocio y persistencia.                                                                                 |
-| Configuración                | Variables de entorno y `.env.example` sin secretos                | Permite configuración por entorno sin credenciales en el repositorio ni en el frontend.                                                                 |
-| CORS                         | Lista explícita de orígenes por entorno                           | Permite los frontends previstos sin abrir el API a cualquier origen.                                                                                    |
-| Persistencia y autenticación | Elegir antes de operar con datos reales                           | PostgreSQL/ORM, autenticación, permisos y aislamiento entre organizaciones requieren requisitos concretos; Recruitment y HR contienen datos personales. |
-| Tareas asíncronas            | No añadir cola/workers hasta que exista un proceso largo definido | Evita infraestructura sin caso de uso; procesamiento de CVs, sincronizaciones y analítica se evaluarán cuando se implementen.                           |
-| Integraciones                | Encapsular adaptadores externos en `integrations`                 | HubSpot, Zendesk, Google Workspace y el ATS son sistemas existentes que pueden fallar o cambiar.                                                        |
+| Decisión                     | Propuesta inicial                                                 | Motivo / límite                                                                                                                                           |
+| ---------------------------- | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Estilo de aplicación         | Monolito modular por dominios                                     | Integra las áreas sin coste de despliegue distribuido prematuro.                                                                                          |
+| Framework y ejecución        | FastAPI + `uv`                                                    | FastAPI ofrece routers y documentación OpenAPI; `uv` gestiona dependencias y ejecución reproducible.                                                      |
+| Contrato entre sistemas      | API REST versionada bajo `/api/v1`                                | Mantiene desacoplados los frontends y el backend.                                                                                                         |
+| Validación                   | Esquemas Pydantic por dominio                                     | Separa contratos de entrada/salida de reglas de negocio y persistencia.                                                                                   |
+| Configuración                | Variables de entorno y `.env.example` sin secretos                | Permite configuración por entorno sin credenciales en el repositorio ni en el frontend.                                                                   |
+| CORS                         | Lista explícita de orígenes por entorno                           | Permite los frontends previstos sin abrir el API a cualquier origen.                                                                                      |
+| Persistencia y autenticación | Elegir antes de operar con datos reales                           | PostgreSQL/ORM, autenticación, permisos y aislamiento entre organizaciones requieren requisitos concretos; Recruitment y HR contienen datos personales.   |
+| Tareas asíncronas            | No añadir cola/workers hasta que exista un proceso largo definido | Evita infraestructura sin caso de uso; procesamiento de CVs, sincronizaciones y analítica se evaluarán cuando se implementen.                             |
+| Integraciones                | Encapsular adaptadores técnicos por proveedor                     | HubSpot, Zendesk, Google Workspace y el ATS son sistemas existentes que pueden fallar o cambiar; la integración es transversal, no un dominio de negocio. |
 
 ## 7. Riesgos si no se sigue la estructura
 

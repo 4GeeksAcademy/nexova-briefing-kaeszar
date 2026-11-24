@@ -1,4 +1,9 @@
-"""Analyze incident CSV files locally without exposing customer data in output."""
+"""Analyze incident CSV files locally without exposing customer data in output.
+
+The script validates each row, aggregates metrics for valid incidents, and can
+export an aggregate-only report. Source rows and personal data are never printed
+or copied to the results file.
+"""
 
 from __future__ import annotations
 
@@ -8,6 +13,8 @@ from collections import Counter
 from datetime import date
 from pathlib import Path
 
+# CSV contract observed in the supplied incident sample. Satisfaction is
+# optional, while the remaining fields are required to analyze a record.
 REQUIRED_FIELDS = (
     "ticket_id",
     "date",
@@ -28,11 +35,14 @@ def validate_record(record: dict[str | None, str | list[str] | None]) -> list[st
     """Return validation issue labels, never including field values or PII."""
     issues: list[str] = []
 
+    # Empty required values make a record incomplete and therefore ineligible
+    # for the main aggregates.
     for field in REQUIRED_FIELDS:
         value = record.get(field)
         if not isinstance(value, str) or not value.strip():
             issues.append(f"missing_required_field:{field}")
 
+    # Restrict categorical dimensions to the values supported by this dataset.
     category = record.get("category")
     if isinstance(category, str) and category.strip() and category.strip() not in VALID_CATEGORIES:
         issues.append("value_out_of_range:category")
@@ -41,6 +51,7 @@ def validate_record(record: dict[str | None, str | list[str] | None]) -> list[st
     if isinstance(status, str) and status.strip() and status.strip() not in VALID_STATUSES:
         issues.append("value_out_of_range:status")
 
+    # Validate date syntax without retaining or displaying the source value.
     record_date = record.get("date")
     if isinstance(record_date, str) and record_date.strip():
         try:
@@ -48,6 +59,7 @@ def validate_record(record: dict[str | None, str | list[str] | None]) -> list[st
         except ValueError:
             issues.append("invalid_format:date")
 
+    # Satisfaction scores use the sample's 1–5 scale; blank scores are allowed.
     score = record.get("satisfaction_score")
     if isinstance(score, str) and score.strip():
         try:
@@ -57,6 +69,7 @@ def validate_record(record: dict[str | None, str | list[str] | None]) -> list[st
         except ValueError:
             issues.append("invalid_format:satisfaction_score")
 
+    # DictReader stores extra cells under a None key when row shape is invalid.
     if None in record:
         issues.append("invalid_record_structure:extra_columns")
 
@@ -75,6 +88,8 @@ def analyze_csv(path: Path) -> dict[str, object]:
 
     with path.open("r", encoding="utf-8-sig", newline="") as csv_file:
         reader = csv.DictReader(csv_file)
+        # Fail fast on an incompatible file rather than silently producing
+        # misleading counts from missing columns.
         headers = reader.fieldnames
         missing_headers = [field for field in EXPECTED_FIELDS if field not in (headers or [])]
         if missing_headers:
@@ -82,6 +97,7 @@ def analyze_csv(path: Path) -> dict[str, object]:
                 "Faltan columnas requeridas en el encabezado: " + ", ".join(missing_headers)
             )
 
+        # Process one row at a time so memory use remains bounded for large files.
         for record in reader:
             total_rows += 1
             issues = validate_record(record)
@@ -96,6 +112,8 @@ def analyze_csv(path: Path) -> dict[str, object]:
             categories[category] += 1
             statuses[status] += 1
 
+            # The requested satisfaction metric applies only to closed cases
+            # that actually have a valid score.
             score = record.get("satisfaction_score")
             if status == "CLOSED" and isinstance(score, str) and score.strip():
                 closed_scores.append(float(score.strip()))
@@ -153,6 +171,8 @@ def print_summary(metrics: dict[str, object]) -> None:
 
 def export_summary(metrics: dict[str, object], destination: Path) -> None:
     """Export one aggregate metric per CSV row; do not export customer data."""
+    # Export only computed totals and validation counts; never include incident
+    # descriptions, emails, company names, or other source columns.
     rows: list[tuple[str, object]] = [
         ("total_rows", metrics["total_rows"]),
         ("valid_rows", metrics["valid_rows"]),
@@ -184,6 +204,7 @@ def export_summary(metrics: dict[str, object], destination: Path) -> None:
 
 
 def ask_export() -> bool:
+    """Prompt until the user enters an accepted yes/no response."""
     while True:
         answer = input("\n¿Deseas exportar los resultados a CSV? [s/n] ").strip().casefold()
         if answer in {"s", "n"}:
@@ -192,6 +213,7 @@ def ask_export() -> bool:
 
 
 def main() -> int:
+    """Parse command-line arguments, run the analysis, and handle export."""
     parser = argparse.ArgumentParser(description="Analiza incidencias desde un fichero CSV local.")
     parser.add_argument("csv_path", type=Path, help="Ruta al fichero CSV de incidencias")
     args = parser.parse_args()

@@ -1,0 +1,16 @@
+metric,value
+total_rows,100
+valid_rows,98
+invalid_rows,2
+category:ACCESS,22
+category:BILLING,19
+category:COMPLAINT,12
+category:HR_QUERY,17
+category:TECHNICAL,28
+status:CLOSED,57
+status:DISCARDED,13
+status:OPEN,28
+invalid_reason:missing_required_field:category,1
+invalid_reason:missing_required_field:client_company,1
+closed_with_satisfaction_score,56
+average_closed_satisfaction,3.8392857142857144

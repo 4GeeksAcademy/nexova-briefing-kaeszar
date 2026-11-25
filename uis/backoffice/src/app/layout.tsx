@@ -33,6 +33,9 @@ export default function RootLayout({
               <a href="/kpis" className="block px-3 py-2 rounded-lg text-primary-200 hover:bg-primary-800 text-sm">
                 KPIs
               </a>
+              <a href="/incidents" className="block px-3 py-2 rounded-lg text-primary-200 hover:bg-primary-800 text-sm">
+                Incidencias
+              </a>
             </nav>
             <div className="p-4 border-t border-primary-800">
               <p className="text-xs text-primary-400">v0.1.0</p>

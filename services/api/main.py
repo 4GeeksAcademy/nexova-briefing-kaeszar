@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
 from app.core.config import settings
+from routers import incidents
 
 app = FastAPI(
     title="Nexova Solutions API",
@@ -26,6 +27,8 @@ app.add_middleware(
 
 # Registrar la API versionada desde un único punto.
 app.include_router(api_router, prefix="/api/v1")
+# Keep the incident-analysis routes at the requested unversioned paths.
+app.include_router(incidents.router, prefix="/api/incidents", tags=["Incidents"])
 
 
 @app.get("/", tags=["Health"])
